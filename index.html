@@ -233,12 +233,107 @@ nav.tabbar .in{max-width:520px;margin:0 auto;display:grid;grid-template-columns:
 nav.tabbar button{display:flex;flex-direction:column;align-items:center;gap:3px;min-height:52px;justify-content:center;border:0;background:transparent;color:var(--muted);font-size:12px;font-weight:600;cursor:pointer}
 nav.tabbar button[aria-current="page"]{color:var(--accent);font-weight:700}
 @media (prefers-reduced-motion: reduce){*{transition:none!important}}
+.home,.gl,.idgrid,.iddeps{display:flex;flex-direction:column;gap:14px}
+.home>.head{margin-bottom:2px}
+.home>.map{background:transparent;border:0}
+.d-only{display:none}
+nav.tabbar .brand{display:none}
+
+/* ===== Ordinateur ===== */
+@media (min-width:1024px){
+  .m-only{display:none} .d-only{display:inline}
+  .app{max-width:1180px;padding-left:max(32px,env(safe-area-inset-left,0px));padding-right:max(32px,env(safe-area-inset-right,0px));padding-block:104px 72px}
+  h1{font-size:46px}
+  h2{font-size:24px}
+  .head{margin-bottom:24px}
+  /* barre du haut */
+  nav.tabbar{top:0;bottom:auto;border-top:0;border-bottom:1px solid var(--line);padding:0 max(32px,env(safe-area-inset-right,0px)) 0 max(32px,env(safe-area-inset-left,0px))}
+  nav.tabbar .in{max-width:1116px;height:68px;display:flex;align-items:center;gap:4px}
+  nav.tabbar button{flex-direction:row;gap:8px;min-height:44px;padding:0 16px;border-radius:999px;font-size:16px}
+  nav.tabbar button svg{width:20px;height:20px}
+  nav.tabbar button:hover{background:var(--seg);color:var(--ink)}
+  nav.tabbar button[aria-current="page"]{background:var(--accent-soft);color:var(--accent-ink)}
+  nav.tabbar .brand{display:flex;margin-right:auto;padding:0 12px 0 0;font-family:var(--f-display);font-style:italic;font-weight:600;font-size:23px;color:var(--ink)}
+  nav.tabbar .brand[aria-current]{background:transparent;color:var(--ink)}
+  nav.tabbar .brand:hover{background:transparent;color:var(--accent)}
+  nav.tabbar .brand img{width:34px;height:34px;border-radius:9px;display:block}
+  .totop{right:max(32px,env(safe-area-inset-right,0px));bottom:32px}
+  /* accueil */
+  .home{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.15fr);grid-template-rows:auto auto auto auto 1fr;grid-template-areas:"frise frise" "head map" "intro map" "cta map" ". map";column-gap:56px;row-gap:18px}
+  .home>.frise{grid-area:frise;height:150px;margin-bottom:18px}
+  .home>.head{grid-area:head;margin:0}
+  .home>.head h1{font-size:54px}
+  .home>.cta{grid-area:cta;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;margin-top:12px}
+  .home>.cta .pg{justify-content:space-between}
+  .home>.intro{grid-area:intro;font-size:20px;line-height:1.6;margin:0}
+  .home>.map{grid-area:map;padding:18px 18px 12px}
+  .home>.map svg{max-height:calc(100dvh - 330px);min-height:420px}
+  .map text{font-size:8.5px}
+  /* liste des régions */
+  .grid{grid-template-columns:repeat(5,minmax(0,1fr));gap:18px}
+  .card{transition:transform .15s,border-color .15s,box-shadow .15s}
+  .card:hover{transform:translateY(-3px);border-color:var(--accent);box-shadow:0 10px 24px rgba(43,36,32,.12)}
+  .card span{font-size:17px;padding:12px 14px 14px}
+  /* fiche région */
+  .band{margin:0 0 0;border-radius:22px;padding:18px 36px 30px}
+  .band h1{font-size:50px}
+  .band p{font-size:16px}
+  .band .kick{font-size:13px}
+  .band .row{gap:32px}
+  .band img{width:190px;height:190px;border-radius:20px}
+  .tabs{margin:18px 0 24px;top:68px;border:1px solid var(--line);border-radius:14px;justify-content:start;gap:6px;padding:0 10px}
+  .tabs button{padding:0 22px;font-size:16px}
+  .tabs button:hover{color:var(--ink)}
+  .list2{grid-template-columns:repeat(3,minmax(0,1fr))}
+  .list2>div:nth-child(n):nth-last-child(n){border-right:1px solid var(--line-soft);border-bottom:1px solid var(--line-soft)}
+  .list2>div:nth-child(3n):nth-last-child(n),.list2>div:last-child:nth-child(n){border-right:0}
+  .list2>div:nth-child(3n+1):nth-last-child(-n+3),.list2>div:nth-child(3n+1):nth-last-child(-n+3)~div{border-bottom:0}
+  .cks{grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}
+  .ck{padding:14px 16px}
+  .vins{display:grid;grid-template-columns:repeat(2,minmax(0,1fr))}
+  .vins .vin:nth-child(odd){border-right:1px solid var(--line-soft)}
+  .vins .vin:nth-child(odd):nth-last-child(2){border-bottom:0}
+  .vins .vin:nth-child(odd):last-child{grid-column:1/-1;border-right:0}
+  .drinks{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px}
+  .drink{padding:16px 18px;align-items:flex-start}
+  .idgrid{display:grid;grid-template-columns:minmax(0,1.5fr) minmax(0,1fr);gap:28px;align-items:start}
+  .idgrid>.txt{padding:22px 26px!important;gap:16px!important}
+  .iddeps{position:sticky;top:156px}
+  .pager{margin-top:32px}
+  .pg:hover,.ck:hover,.dish:hover{cursor:pointer}
+  /* quiz */
+  .narrow{max-width:780px;margin:0 auto}
+  .opts{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+  .q{padding:28px 28px}
+  .q .ques{font-size:25px}
+  .opt:not(:disabled):hover{border-color:var(--accent);background:var(--accent-soft)}
+  .btn{max-width:360px;margin:0 auto}
+  /* glossaire */
+  .gl{display:grid;grid-template-columns:320px minmax(0,1fr);gap:40px;align-items:start}
+  .gside{position:sticky;top:100px;background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:20px}
+  .gside .filters button{padding:0 14px}
+  .entry:hover{background:var(--accent-soft)}
+  /* fenêtre */
+  dialog.pop{width:min(880px,calc(100vw - 64px))}
+  dialog.pop[open]{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr)}
+  .pop .ph,.pop .ph>div{height:100%}
+  .pop .ph .pic{padding:36px 28px;min-height:380px}
+  .pop .ph .pic img{width:min(100%,360px);max-width:100%;max-height:420px;object-fit:cover}
+  .pop .ph .drinkpic img{width:auto;object-fit:contain}
+  .pop .ph .drinkpic img{max-height:400px}
+  .pop .ph .x{left:auto}
+  .pop .bd{padding:36px 32px;gap:12px;justify-content:center}
+  .pop .bd h2{font-size:32px}
+  .pop .bd p{font-size:17px;line-height:1.6}
+}
+@media (min-width:1024px) and (max-width:1200px){ .grid{grid-template-columns:repeat(4,minmax(0,1fr))} }
 </style>
 
 <main class="app" id="view" aria-live="polite"></main>
 <dialog class="pop" id="pop" aria-labelledby="pop-title"></dialog>
 <button class="totop" id="totop" aria-label="Remonter en haut de la page" tabindex="-1"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 19V5M5 12l7-7 7 7"/></svg></button>
 <nav class="tabbar" aria-label="Navigation principale"><div class="in">
+  <button class="brand" data-go="carte" aria-label="Accueil, Régions de France"><img src="img/icone/favicon-64.png" alt="" width="34" height="34"><span>Régions de France</span></button>
   <button data-go="carte"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 4 3 6v14l6-2 6 2 6-2V4l-6 2-6-2z"/><path d="M9 4v14M15 6v14"/></svg>Carte</button>
   <button data-go="regions"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="4" width="7" height="7" rx="1.5"/><rect x="13" y="4" width="7" height="7" rx="1.5"/><rect x="4" y="13" width="7" height="7" rx="1.5"/><rect x="13" y="13" width="7" height="7" rx="1.5"/></svg>Régions</button>
   <button data-go="glossaire"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 5a2 2 0 0 1 2-2h13v16H6a2 2 0 0 0-2 2z"/><path d="M4 19V5"/><path d="M8 7h7"/></svg>Glossaire</button>
@@ -369,11 +464,11 @@ function go(v, opts={}){
 function vCarte(){
   const paths = R.map(r=>`<a href="#" data-region="${r.id}" class="${r.id==='ara'?'home':''}" aria-label="${esc(r.nom)}"><path fill="${r.c}" d="${MAP[r.code]}"/></a>`).join('');
   const labels = LABELS.map(([code,x,y,lines])=>`<text x="${x}" y="${y}">${lines.map((l,i)=>`<tspan x="${x}" dy="${i?10:0}">${esc(l)}</tspan>`).join('')}</text>`).join('');
-  return `<div class="head"><h1>La France et ses régions</h1>${stroke(150)}</div>
-  <div class="stack">
+  return `<div class="home"><div class="head"><h1>La France et ses régions</h1>${stroke(150)}</div>
    <div class="frise" aria-hidden="true"><div class="track"><img src="img/frise.jpg" alt=""><img src="img/frise.jpg" alt=""></div></div>
+   <div class="cta d-only"><button class="panel pg" data-go="regions"><span><small>Explorer</small><b>Les 13 régions</b></span><span class="ar">${ICON.chev}</span></button><button class="panel pg" data-go="quiz"><span><small>Réviser</small><b>Le quiz</b></span><span class="ar">${ICON.chev}</span></button></div>
    <p class="intro">Treize régions, treize terroirs. Pour chacune, découvre son identité, ses spécialités, ses fromages et sa cave : tout ce qu’il faut pour conseiller un client et parler de la France gourmande avec assurance.</p>
-   <div class="panel map"><svg viewBox="0 0 340 328" role="group" aria-label="Carte des 13 régions de France">${paths}<g aria-hidden="true">${labels}</g></svg><p>Touchez une région pour ouvrir sa fiche</p></div>
+   <div class="panel map"><svg viewBox="0 0 340 328" role="group" aria-label="Carte des 13 régions de France">${paths}<g aria-hidden="true">${labels}</g></svg><p><span class="m-only">Touchez</span><span class="d-only">Cliquez sur</span> une région pour ouvrir sa fiche</p></div>
   </div>`;
 }
 
@@ -408,14 +503,14 @@ function vRegion(){
 }
 function secIdentite(r){
   const d=r.detail;
-  return `<div class="panel txt" style="padding:14px;display:flex;flex-direction:column;gap:12px">${d.intro.map(([t,p])=>`<div><h3>${esc(t)}</h3>${Array.isArray(p)?`<ul class="pts">${p.map(x=>`<li>${esc(x)}</li>`).join('')}</ul>`:`<p>${esc(p)}</p>`}</div>`).join('')}</div>
-  <div class="sec">${ICON.pin}<h2>Départements et préfectures</h2></div>
-  <div class="panel" style="overflow-x:auto"><table class="deps"><caption class="muted" style="text-align:left;padding:10px 14px 0;font-size:13px">Numéro, département, préfecture</caption><tbody>${d.deps.map(([n,dep,p])=>`<tr><td>${n}</td><td>${dep}</td><td>${p}</td></tr>`).join('')}</tbody></table></div>`;
+  return `<div class="idgrid"><div class="panel txt" style="padding:14px;display:flex;flex-direction:column;gap:12px">${d.intro.map(([t,p])=>`<div><h3>${esc(t)}</h3>${Array.isArray(p)?`<ul class="pts">${p.map(x=>`<li>${esc(x)}</li>`).join('')}</ul>`:`<p>${esc(p)}</p>`}</div>`).join('')}</div>
+  <div class="iddeps stack"><div class="sec">${ICON.pin}<h2>Départements et préfectures</h2></div>
+  <div class="panel" style="overflow-x:auto"><table class="deps"><caption class="muted" style="text-align:left;padding:10px 14px 0;font-size:13px">Numéro, département, préfecture</caption><tbody>${d.deps.map(([n,dep,p])=>`<tr><td>${n}</td><td>${dep}</td><td>${p}</td></tr>`).join('')}</tbody></table></div></div></div>`;
 }
 function secAssiette(r,full){
   const d=r.detail;
   const hasD = r.spe.some(s=>r.speD[s]);
-  let h = `<div class="sec">${ICON.plate}<h2>Spécialités culinaires et produits marqueurs</h2></div>${hasD?'<p class="muted" style="margin:-6px 0 0;font-size:14px">Touchez un plat pour le découvrir.</p>':''}<div class="panel list2">${r.spe.map(s=>r.speD[s]?`<div><button class="dish" data-dish="${esc(s)}" data-of="${r.id}"><span>${esc(s)}</span>${ICON.plus}</button></div>`:`<div>${esc(s)}</div>`).join('')}</div>`;
+  let h = `<div class="sec">${ICON.plate}<h2>Spécialités culinaires et produits marqueurs</h2></div>${hasD?'<p class="muted" style="margin:-6px 0 0;font-size:14px"><span class="m-only">Touchez</span><span class="d-only">Cliquez sur</span> un plat pour le découvrir.</p>':''}<div class="panel list2">${r.spe.map(s=>r.speD[s]?`<div><button class="dish" data-dish="${esc(s)}" data-of="${r.id}"><span>${esc(s)}</span>${ICON.plus}</button></div>`:`<div>${esc(s)}</div>`).join('')}</div>`;
   if(full && d && d.astuce) h += `<p class="tip"><b>Le saviez-vous ?</b> ${d.astuce}</p>`;
   return h;
 }
@@ -436,7 +531,7 @@ function secPlateau(r){
 function secCave(r){
   const d=r.detail; let h='';
   if(d.vins && d.vins.length) h += `<div class="sec">${ICON.glass}<h2>Les régions viticoles</h2></div>
-  <div class="panel">${d.vins.map(([n,t,c])=>`<div class="vin"><h3>${esc(n)}</h3><p>${esc(t)}</p>${c?`<p class="cep"><b>Cépages :</b> ${esc(c)}</p>`:''}</div>`).join('')}</div>`;
+  <div class="panel vins">${d.vins.map(([n,t,c])=>`<div class="vin"><h3>${esc(n)}</h3><p>${esc(t)}</p>${c?`<p class="cep"><b>Cépages :</b> ${esc(c)}</p>`:''}</div>`).join('')}</div>`;
   h += `<div class="sec" style="margin-top:4px">${ICON.bottle}<h2>Les boissons de la région</h2></div>
   <div class="drinks">${d.boissons.map(([n,desc,img])=>`<div class="drink panel">${img?`<img src="${img}" alt="${esc(n)}" loading="lazy">`:''}<div><h3>${esc(n)}</h3><p>${esc(desc)}</p></div></div>`).join('')}</div>`;
   if(d.caveTip) h += `<p class="tip"><b>Le saviez-vous ?</b> ${esc(d.caveTip)}</p>`;
@@ -482,14 +577,14 @@ function buildQuiz(){
 function vQuiz(){
   if(!S.quiz) buildQuiz();
   const z=S.quiz, total=z.qs.length;
-  const top = `<div class="head"><div class="kicker">Révision</div><h1>Le quiz</h1>${stroke(90)}</div>
+  const top = `<div class="narrow"><div class="head"><div class="kicker">Révision</div><h1>Le quiz</h1>${stroke(90)}</div>
   <div class="stack"><div class="seg" role="group" aria-label="Choix du quiz">
    <button aria-pressed="${S.qMode==='all'}" data-qmode="all">Toutes les régions</button>
    <button aria-pressed="${S.qMode==='one'}" data-qmode="one">Une région</button></div>
    ${S.qMode==='one'?`<div><label class="l" for="qregion">Région à réviser</label><select id="qregion">${R.map(r=>`<option value="${r.id}" ${r.id===S.qRegion?'selected':''}>${esc(r.nom)}</option>`).join('')}</select></div>`:''}`;
   if(z.i>=total){
     const msg = z.score>=8?'Excellent, la région n’a plus de secret pour vous.':z.score>=5?'Bon travail. Encore une série pour consolider ?':'Relisez les fiches, puis retentez une série.';
-    return top + `<div class="panel score"><div class="kicker">Résultat</div><div class="n">${z.score}/${total}</div><p class="muted" style="margin:0">${msg}</p></div><button class="btn" data-restart>Nouvelle série</button></div>`;
+    return top + `<div class="panel score"><div class="kicker">Résultat</div><div class="n">${z.score}/${total}</div><p class="muted" style="margin:0">${msg}</p></div><button class="btn" data-restart>Nouvelle série</button></div></div>`;
   }
   const q=z.qs[z.i], a=z.answered;
   const opts = q.opts.map((o,k)=>{
@@ -500,7 +595,7 @@ function vQuiz(){
   const fb = a===null ? '' : (q.opts[a].ok ? `<p class="fb good"><strong>Bonne réponse.</strong> ${esc(q.expl)}</p>` : `<p class="fb bad"><strong>Raté.</strong> ${esc(q.expl)}</p>`);
   return top + `<div class="prog"><div class="l"><span>Question ${z.i+1} sur ${total}</span><span>${q.theme}</span></div><div class="bar" role="progressbar" aria-label="Avancement du quiz" aria-valuemin="0" aria-valuemax="${total}" aria-valuenow="${z.i}"><i style="width:${z.i/total*100}%"></i></div></div>
    <div class="panel q"><p class="ques">${esc(q.q)}</p><div class="opts">${opts}</div>${fb}</div>
-   ${a!==null?`<button class="btn" data-nextq>${z.i+1<total?'Question suivante':'Voir mon résultat'}</button>`:''}</div>`;
+   ${a!==null?`<button class="btn" data-nextq>${z.i+1<total?'Question suivante':'Voir mon résultat'}</button>`:''}</div></div>`;
 }
 
 /* ---------- Glossaire ---------- */
@@ -516,12 +611,12 @@ const GLOS = (()=>{
 })();
 function vGlossaire(){
   return `<div class="head"><div class="kicker">Plats, fromages &amp; boissons</div><h1>Le glossaire</h1>${stroke(120)}</div>
-  <div class="stack">
+  <div class="gl"><div class="gside stack">
    <div style="display:flex;flex-direction:column;gap:6px"><label class="l" for="gsearch">Rechercher un plat, un fromage, une boisson, une région</label>
    <div class="search"><span class="muted">${ICON.search}</span><input id="gsearch" type="search" placeholder="ex. Comté, cassoulet…" value="${esc(S.gSearch)}" autocomplete="off"></div></div>
    <div class="filters" role="group" aria-label="Filtrer">${[['tous','Tous'],['plat','Plats'],['fromage','Fromages'],['boisson','Boissons']].map(([k,l])=>`<button aria-pressed="${S.gFilter===k}" data-gfilter="${k}">${l}</button>`).join('')}</div>
    <div style="display:flex;flex-direction:column;gap:6px"><label class="l" for="gregion">Région</label><select id="gregion"><option value="all" ${S.gRegion==='all'?'selected':''}>Toutes les régions</option>${R.map(r=>`<option value="${r.id}" ${S.gRegion===r.id?'selected':''}>${esc(r.nom)}</option>`).join('')}</select></div>
-   <div id="glist" class="stack"></div></div>`;
+   </div><div id="glist" class="stack"></div></div>`;
 }
 function renderGlossList(){
   const el=document.getElementById('glist'); if(!el) return;

@@ -227,6 +227,8 @@ dialog.pop::backdrop{background:rgba(30,22,16,.55)}
 
 /* navigation */
 nav.tabbar{position:fixed;left:0;right:0;bottom:0;background:var(--surface);border-top:1px solid var(--line);padding:8px max(8px,env(safe-area-inset-right,0px)) calc(10px + env(safe-area-inset-bottom,0px)) max(8px,env(safe-area-inset-left,0px));z-index:5}
+.totop{position:fixed;right:max(16px,env(safe-area-inset-right,0px));bottom:calc(86px + env(safe-area-inset-bottom,0px));width:48px;height:48px;border-radius:50%;border:1px solid var(--line);background:var(--surface);color:var(--accent);display:grid;place-items:center;box-shadow:0 6px 18px rgba(43,36,32,.18);cursor:pointer;z-index:20;opacity:0;transform:translateY(10px);pointer-events:none;transition:opacity .2s,transform .2s}
+.totop.on{opacity:1;transform:none;pointer-events:auto}
 nav.tabbar .in{max-width:520px;margin:0 auto;display:grid;grid-template-columns:repeat(4,minmax(0,1fr))}
 nav.tabbar button{display:flex;flex-direction:column;align-items:center;gap:3px;min-height:52px;justify-content:center;border:0;background:transparent;color:var(--muted);font-size:12px;font-weight:600;cursor:pointer}
 nav.tabbar button[aria-current="page"]{color:var(--accent);font-weight:700}
@@ -235,6 +237,7 @@ nav.tabbar button[aria-current="page"]{color:var(--accent);font-weight:700}
 
 <main class="app" id="view" aria-live="polite"></main>
 <dialog class="pop" id="pop" aria-labelledby="pop-title"></dialog>
+<button class="totop" id="totop" aria-label="Remonter en haut de la page" tabindex="-1"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 19V5M5 12l7-7 7 7"/></svg></button>
 <nav class="tabbar" aria-label="Navigation principale"><div class="in">
   <button data-go="carte"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 4 3 6v14l6-2 6 2 6-2V4l-6 2-6-2z"/><path d="M9 4v14M15 6v14"/></svg>Carte</button>
   <button data-go="regions"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="4" width="7" height="7" rx="1.5"/><rect x="13" y="4" width="7" height="7" rx="1.5"/><rect x="4" y="13" width="7" height="7" rx="1.5"/><rect x="13" y="13" width="7" height="7" rx="1.5"/></svg>Régions</button>
@@ -590,6 +593,13 @@ document.addEventListener('click',e=>{
   else if(t.dataset.qmode){ S.qMode=t.dataset.qmode; S.quiz=null; render(); }
   else if(t.dataset.gfilter){ S.gFilter=t.dataset.gfilter; document.querySelectorAll('[data-gfilter]').forEach(b=>b.setAttribute('aria-pressed',b===t)); renderGlossList(); }
 });
+(function(){
+  const b=document.getElementById('totop');
+  const upd=()=>{ const on=window.scrollY>window.innerHeight*0.8; b.classList.toggle('on',on); b.tabIndex=on?0:-1; };
+  window.addEventListener('scroll',upd,{passive:true});
+  b.addEventListener('click',()=>{ const calm=window.matchMedia('(prefers-reduced-motion: reduce)').matches; window.scrollTo({top:0,behavior:calm?'auto':'smooth'}); });
+  upd();
+})();
 render();
 </script>
 

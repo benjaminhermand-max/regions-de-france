@@ -29,18 +29,7 @@
   --f-display:'Fraunces', Georgia, 'Times New Roman', serif;
   --f-body:'Source Sans 3', 'Segoe UI', system-ui, sans-serif;
 }
-@media (prefers-color-scheme: dark){ :root:not([data-theme="light"]){
-  --paper:#1E1915; --surface:#2A231E; --ink:#F1E7D9; --muted:#BBAA96;
-  --line:#3F352D; --line-soft:#352C25; --seg:#352C25;
-  --accent:#E3895C; --accent-soft:#4A2B1C; --accent-ink:#F6D2BF;
-  --ok:#7FB487; --ok-soft:#24352A; --ok-ink:#CDE7CF;
-  --ko:#E58A80; --ko-soft:#3F2422; --ko-ink:#F4CFCA; color-scheme:dark } }
-:root[data-theme="dark"]{
-  --paper:#1E1915; --surface:#2A231E; --ink:#F1E7D9; --muted:#BBAA96;
-  --line:#3F352D; --line-soft:#352C25; --seg:#352C25;
-  --accent:#E3895C; --accent-soft:#4A2B1C; --accent-ink:#F6D2BF;
-  --ok:#7FB487; --ok-soft:#24352A; --ok-ink:#CDE7CF;
-  --ko:#E58A80; --ko-soft:#3F2422; --ko-ink:#F4CFCA; color-scheme:dark }
+:root{color-scheme:light}
 
 html,body{background:var(--paper)}
 body{color:var(--ink);font-family:var(--f-body);font-size:16px;line-height:1.5}

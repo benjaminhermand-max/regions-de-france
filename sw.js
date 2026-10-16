@@ -1,7 +1,7 @@
 // Fonctionnement hors connexion : l'appli est mise en cache à la première visite,
 // puis chaque photo consultée est gardée pour être revue sans réseau.
 // Changer VERSION à chaque mise à jour pour rafraîchir le cache.
-const VERSION = "regions-v4";
+const VERSION = "regions-v5";
 const FICHIERS = ["./", "manifest.webmanifest", "img/frise.jpg", "img/icone/icone-192.png", "img/icone/apple-touch-icon.png", "img/ara.jpg", "img/bfc.jpg", "img/bretagne.jpg", "img/corse.jpg", "img/cvl.jpg", "img/grandest.jpg", "img/hdf.jpg", "img/idf.jpg", "img/na.jpg", "img/normandie.jpg", "img/occitanie.jpg", "img/paca.jpg", "img/pdl.jpg"];
 
 self.addEventListener("install", (e) => {

@@ -208,6 +208,10 @@ dialog.pop::backdrop{background:rgba(30,22,16,.55)}
 .pop .ph .none{aspect-ratio:4/3;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;color:var(--band-ink);font-weight:700;font-size:14px;text-align:center;padding:16px}
 .pop .ph .none span{opacity:.75;font-weight:600}
 .pop .x{position:absolute;top:10px;right:10px;width:44px;height:44px;border-radius:50%;border:0;background:var(--surface);color:var(--ink);display:flex;align-items:center;justify-content:center;cursor:pointer;box-shadow:0 2px 8px rgba(0,0,0,.18)}
+.pop .nv{position:absolute;top:50%;transform:translateY(-50%);width:44px;height:44px;border-radius:50%;border:0;background:var(--surface);color:var(--ink);display:grid;place-items:center;cursor:pointer;box-shadow:0 2px 8px rgba(0,0,0,.2);z-index:1}
+.pop .nv:hover{color:var(--accent)}
+.pop .pv{left:10px} .pop .nv.nx{right:10px}
+.pop .cnt{position:absolute;bottom:10px;left:50%;transform:translateX(-50%);background:rgba(43,36,32,.62);color:#FFFCF6;font-size:13px;font-weight:700;padding:2px 10px;border-radius:999px;font-variant-numeric:tabular-nums}
 .pop .bd{padding:16px 18px 20px;display:flex;flex-direction:column;gap:8px}
 .pop .bd p{margin:0;max-width:65ch}
 .pop .reg{display:flex;align-items:center;gap:6px;font-size:13px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
@@ -646,24 +650,45 @@ function openCheese(name, rid){
   const meta = `<div class="meta">${f.lab&&f.lab!=='—'?`<span class="chip">${esc(f.lab)}</span>`:''}<span class="chip">Lait de ${esc((f.lait||'').toLowerCase())}</span><span class="chip"><i style="background:var(--p-${p})" aria-hidden="true"></i>${PATE[p]}</span></div>`;
   showPop(r, ph, name, meta + (f.part?`<p>${esc(f.part)}</p>`:''));
 }
+/* navigation d'une fiche à l'autre dans la fenêtre (flèches, clavier, glisser) */
+const PL = {list:[], i:0, focus:null};
+const kindOf = el => el.dataset.dish!==undefined ? ['dish',el.dataset.dish] : el.dataset.drink!==undefined ? ['drink',el.dataset.drink] : ['cheese',el.dataset.cheese];
+function startPop(el){
+  const gl = el.closest('#glist');
+  const scope = gl || view;
+  const sel = gl ? '[data-dish],[data-drink],[data-cheese]' : '[data-'+kindOf(el)[0]+']';
+  const els = [...scope.querySelectorAll(sel)];
+  PL.list = els.map(x=>[...kindOf(x), x.dataset.of]); PL.focus = null;
+  openAt(Math.max(0, els.indexOf(el)));
+}
+function openAt(i){
+  const n = PL.list.length; if(!n) return;
+  PL.i = (i+n)%n; const [k,name,rid] = PL.list[PL.i];
+  ({dish:openDish, drink:openDrink, cheese:openCheese})[k](name, rid);
+}
+function stepPop(d){ PL.focus = d<0 ? '[data-pnav="-1"]' : '[data-pnav="1"]'; openAt(PL.i+d); }
 function showPop(r, ph, name, body){
   const onFiche = S.view==='region' && S.region===r.id;
-  pop.innerHTML = typo(`<div class="ph">${ph}<button class="x" data-close aria-label="Fermer">${ICON.close}</button></div>
+  const n = PL.list.length;
+  const nav = n>1 ? `<button class="nv pv" data-pnav="-1" aria-label="Précédent">${ICON.back}</button><button class="nv nx" data-pnav="1" aria-label="Suivant">${ICON.chev}</button><span class="cnt" aria-live="polite">${PL.i+1} / ${n}</span>` : '';
+  pop.innerHTML = typo(`<div class="ph">${ph}${nav}<button class="x" data-close aria-label="Fermer">${ICON.close}</button></div>
    <div class="bd"><div class="reg"><i style="background:${r.c}" aria-hidden="true"></i>${esc(r.nom)}</div><h2 id="pop-title">${esc(name)}</h2>${body}${onFiche?'':`<button class="go" data-region="${r.id}">Voir la fiche ${esc(r.court)}</button>`}</div>`);
-  try{ pop.showModal(); }catch(err){ pop.setAttribute('open',''); }
-  pop.querySelector('[data-close]').focus();
+  if(!pop.open){ try{ pop.showModal(); }catch(err){ pop.setAttribute('open',''); } }
+  (pop.querySelector(PL.focus||'[data-close]')||pop.querySelector('[data-close]')).focus();
 }
-pop.addEventListener('click',e=>{ if(e.target===pop || e.target.closest('[data-close]')) pop.close(); });
+pop.addEventListener('click',e=>{ const nv=e.target.closest('[data-pnav]'); if(nv){ stepPop(+nv.dataset.pnav); return; } if(e.target===pop || e.target.closest('[data-close]')) pop.close(); });
+pop.addEventListener('close',()=>{ PL.list=[]; PL.focus=null; });
+pop.addEventListener('keydown',e=>{ if(PL.list.length<2) return; if(e.key==='ArrowRight'){ e.preventDefault(); stepPop(1); } else if(e.key==='ArrowLeft'){ e.preventDefault(); stepPop(-1); } });
+(()=>{ let x0=null, y0=null;
+  pop.addEventListener('touchstart',e=>{ x0=e.touches[0].clientX; y0=e.touches[0].clientY; },{passive:true});
+  pop.addEventListener('touchend',e=>{ if(x0===null||PL.list.length<2) return; const dx=e.changedTouches[0].clientX-x0, dy=e.changedTouches[0].clientY-y0; x0=null; if(Math.abs(dx)>50 && Math.abs(dx)>Math.abs(dy)*1.5) stepPop(dx<0?1:-1); },{passive:true});
+})();
 
 document.addEventListener('click',e=>{
-  const dish=e.target.closest('[data-dish]');
-  if(dish){ openDish(dish.dataset.dish, dish.dataset.of); return; }
+  const op=e.target.closest('[data-dish],[data-drink],[data-cheese]');
+  if(op && !op.closest('#pop')){ startPop(op); return; }
   const qz=e.target.closest('[data-quizregion]');
   if(qz){ S.qMode='one'; S.qRegion=qz.dataset.quizregion; S.quiz=null; go('quiz'); return; }
-  const dk=e.target.closest('[data-drink]');
-  if(dk){ openDrink(dk.dataset.drink, dk.dataset.of); return; }
-  const ch=e.target.closest('[data-cheese]');
-  if(ch){ openCheese(ch.dataset.cheese, ch.dataset.of); return; }
   if(pop.open && e.target.closest('[data-region]')) pop.close();
   const t=e.target.closest('[data-region],[data-go],[data-tab],[data-ans],[data-nextq],[data-restart],[data-qmode],[data-gfilter]');
   if(!t) return;

@@ -458,11 +458,31 @@ const store = {get(k){try{return localStorage.getItem(k)}catch(e){return null}},
 const S = {view:'carte', region:null, tab:'identite', quiz:null, qMode:'all', qRegion:'ara', gFilter:'tous', gSearch:'', gRegion:'all'};
 const view = document.getElementById('view');
 
-function go(v, opts={}){
+/* bouton retour du téléphone : on navigue dans l'appli au lieu de la quitter */
+const hs = () => history.state || {d:0};
+const snap = d => ({view:S.view, region:S.region, tab:S.tab, d});
+let skipBack = false, fromHist = false;
+function show(v, opts){
   Object.assign(S, {view:v}, opts);
   if(v==='region'){ store.set('derniere', S.region); }
   render(); window.scrollTo(0,0);
 }
+function go(v, opts={}, push){
+  const d = hs().d || 0;
+  if(v==='carte' && d>0){ try{ history.go(-d); return; }catch(e){} }
+  show(v, opts);
+  try{
+    if(v==='carte') history.replaceState(snap(0), '');
+    else if(v==='region' || push || d===0) history.pushState(snap(d+1), '');
+    else history.replaceState(snap(d), '');
+  }catch(e){}
+}
+window.addEventListener('popstate', e=>{
+  const s = e.state; if(!s) return;
+  if(s.pop){ if(!pop.open) history.back(); return; }
+  if(pop.open){ fromHist = true; pop.close(); fromHist = false; }
+  if(s.view!==S.view || s.region!==S.region || s.tab!==S.tab){ Object.assign(S, {view:s.view, region:s.region, tab:s.tab}); render(); window.scrollTo(0,0); }
+});
 
 /* ---------- Carte ---------- */
 function vCarte(){
@@ -695,11 +715,11 @@ function showPop(r, ph, name, body){
   const nav = n>1 ? `<button class="nv pv" data-pnav="-1" aria-label="Précédent">${ICON.back}</button><button class="nv nx" data-pnav="1" aria-label="Suivant">${ICON.chev}</button><span class="cnt" aria-live="polite">${PL.i+1} / ${n}</span>` : '';
   pop.innerHTML = typo(`<div class="ph">${ph}${nav}<button class="x" data-close aria-label="Fermer">${ICON.close}</button></div>
    <div class="bd"><div class="reg"><i style="background:${r.c}" aria-hidden="true"></i>${esc(r.nom)}</div><h2 id="pop-title">${esc(name)}</h2>${body}${onFiche?'':`<button class="go" data-region="${r.id}">Voir la fiche ${esc(r.court)}</button>`}</div>`);
-  if(!pop.open){ try{ pop.showModal(); }catch(err){ pop.setAttribute('open',''); } }
+  if(!pop.open){ try{ pop.showModal(); }catch(err){ pop.setAttribute('open',''); } try{ history.pushState({...snap((hs().d||0)+1), pop:true}, ''); }catch(err){} }
   (pop.querySelector(PL.focus||'[data-close]')||pop.querySelector('[data-close]')).focus();
 }
 pop.addEventListener('click',e=>{ const nv=e.target.closest('[data-pnav]'); if(nv){ stepPop(+nv.dataset.pnav); return; } if(e.target===pop || e.target.closest('[data-close]')) pop.close(); });
-pop.addEventListener('close',()=>{ PL.list=[]; PL.focus=null; });
+pop.addEventListener('close',()=>{ PL.list=[]; PL.focus=null; if(fromHist || skipBack){ skipBack=false; return; } if(hs().pop) history.back(); });
 pop.addEventListener('keydown',e=>{ if(PL.list.length<2) return; if(e.key==='ArrowRight'){ e.preventDefault(); stepPop(1); } else if(e.key==='ArrowLeft'){ e.preventDefault(); stepPop(-1); } });
 (()=>{ let x0=null, y0=null;
   pop.addEventListener('touchstart',e=>{ x0=e.touches[0].clientX; y0=e.touches[0].clientY; },{passive:true});
@@ -710,14 +730,14 @@ document.addEventListener('click',e=>{
   const op=e.target.closest('[data-dish],[data-drink],[data-cheese]');
   if(op && !op.closest('#pop')){ startPop(op); return; }
   const qz=e.target.closest('[data-quizregion]');
-  if(qz){ S.qMode='one'; S.qRegion=qz.dataset.quizregion; S.quiz=null; go('quiz'); return; }
-  if(pop.open && e.target.closest('[data-region]')) pop.close();
+  if(qz){ S.qMode='one'; S.qRegion=qz.dataset.quizregion; S.quiz=null; go('quiz', {}, true); return; }
+  if(pop.open && e.target.closest('[data-region]')){ skipBack = true; pop.close(); }
   const t=e.target.closest('[data-region],[data-go],[data-tab],[data-ans],[data-nextq],[data-restart],[data-qmode],[data-gfilter]');
   if(!t) return;
-  if(t.tagName==='A') e.preventDefault();
+  if(t.tagName.toUpperCase()==='A') e.preventDefault();
   if(t.dataset.region){ go('region',{region:t.dataset.region, tab:'identite'}); }
   else if(t.dataset.go){ go(t.dataset.go); }
-  else if(t.dataset.tab){ const top=t.hasAttribute('data-top'); S.tab=t.dataset.tab; render(); const tb=document.getElementById('tab-'+S.tab); if(top){ window.scrollTo(0,0); tb?.focus({preventScroll:true}); } else tb?.focus(); }
+  else if(t.dataset.tab){ const top=t.hasAttribute('data-top'); S.tab=t.dataset.tab; render(); try{ history.replaceState(snap(hs().d||0), ''); }catch(err){} const tb=document.getElementById('tab-'+S.tab); if(top){ window.scrollTo(0,0); tb?.focus({preventScroll:true}); } else tb?.focus(); }
   else if(t.dataset.ans!==undefined){ const z=S.quiz; z.answered=+t.dataset.ans; if(z.qs[z.i].opts[z.answered].ok) z.score++; render(); }
   else if(t.hasAttribute('data-nextq')){ const z=S.quiz; z.i++; z.answered=null; render(); }
   else if(t.hasAttribute('data-restart')){ S.quiz=null; render(); }
@@ -731,6 +751,7 @@ document.addEventListener('click',e=>{
   b.addEventListener('click',()=>{ const calm=window.matchMedia('(prefers-reduced-motion: reduce)').matches; window.scrollTo({top:0,behavior:calm?'auto':'smooth'}); });
   upd();
 })();
+try{ history.replaceState(snap(0), ''); }catch(e){}
 render();
 </script>
 

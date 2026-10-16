@@ -562,9 +562,20 @@ function buildQuiz(){
     });
     if(r.detail) r.detail.deps.forEach(([num,dep,pr])=>pool.push({q:`Quelle est la préfecture du département ${dep} (${num}) ?`, opts:()=>shuffle([pr,...pick(r.detail.deps.filter(x=>x[2]!==pr).map(x=>x[2]),3)]).map(x=>({label:x,ok:x===pr})), theme:'Départements', expl:`${dep} (${num}) : ${pr}.`}));
   }
-  const dq = pick(pool.filter(q=>q.drink), S.qMode==='one'?3:2);
-  const rest = pick(pool.filter(q=>!dq.includes(q) && !(q.drink && dq.some(d=>d.expl.split(' :')[0]===q.expl.split(' :')[0]))), Math.max(0, 10-dq.length));
-  const qs = shuffle([...dq, ...rest]).slice(0,10).map(q=>({...q, opts:q.opts()}));
+  /* questions déjà posées : on les met de côté jusqu'à avoir fait le tour de la réserve */
+  const qid = q => q.theme+'|'+q.q+'|'+q.expl;
+  const key = 'quiz-vu-'+(S.qMode==='all'?'toutes':S.qRegion);
+  let seen; try{ seen = new Set(JSON.parse(store.get(key)||'[]')); }catch(e){ seen = new Set(); }
+  let fresh = pool.filter(q=>!seen.has(qid(q)));
+  if(fresh.length < 10){ seen = new Set(); }
+  const item = q => q.expl.split(' :')[0];
+  const nd = S.qMode==='one'?3:2;
+  const dq = pick(fresh.filter(q=>q.drink), nd);
+  let chosen = [...dq, ...pick(fresh.filter(q=>!dq.includes(q) && !(q.drink && dq.some(d=>item(d)===item(q)))), Math.max(0, 10-dq.length))];
+  if(chosen.length < 10) chosen = chosen.concat(pick(pool.filter(q=>!chosen.includes(q) && !chosen.some(c=>c.drink && q.drink && item(c)===item(q))), 10-chosen.length));
+  chosen.forEach(q=>seen.add(qid(q)));
+  store.set(key, JSON.stringify([...seen]));
+  const qs = shuffle(chosen).slice(0,10).map(q=>({...q, opts:q.opts()}));
   S.quiz = {qs, i:0, score:0, answered:null};
 }
 function vQuiz(){

@@ -235,6 +235,21 @@ dialog.pop::backdrop{background:rgba(30,22,16,.55)}
 .qimg{display:flex;align-items:center;justify-content:center;border-radius:14px;padding:18px;min-height:180px}
 .qimg img{display:block;max-width:min(100%,300px);max-height:240px;border-radius:12px;background:#fff;box-shadow:0 6px 16px rgba(30,20,10,.22)}
 .qimg.cut img{background:transparent;box-shadow:none;max-height:260px;filter:drop-shadow(0 8px 10px rgba(30,20,10,.3))}
+/* défi final et carte dorée */
+.seg.seg3{grid-template-columns:repeat(3,minmax(0,1fr))}
+.seg.seg3 button{line-height:1.15;padding:4px 6px;font-size:15px}
+.lock{padding:26px 20px;display:flex;flex-direction:column;align-items:center;text-align:center;gap:10px}
+.lock-i{font-size:48px;line-height:1}
+.lock p{margin:0;max-width:46ch}
+.lock-bar{width:100%;max-width:300px;height:8px;border-radius:999px;background:var(--line);overflow:hidden}
+.lock-bar i{display:block;height:100%;background:#C9A227;border-radius:999px}
+.lock .btn{max-width:320px;margin-top:6px}
+.map.gold svg{filter:drop-shadow(0 0 2px #D4AF37) drop-shadow(0 0 2px #D4AF37) drop-shadow(0 0 16px rgba(212,175,55,.7))}
+.map p.gold-l{margin-top:8px;font-family:var(--f-display);font-style:italic;font-weight:600;font-size:20px;color:#8A6A10}
+.final-b{display:block;margin:10px auto 2px;min-height:44px;padding:0 20px;border-radius:999px;border:1.5px solid #C9A227;background:#FBF3D9;color:#5C4705;font-weight:700;cursor:pointer}
+dialog.tro.big{width:min(440px,calc(100vw - 32px))}
+dialog.tro.big .tro-i{font-size:92px}
+dialog.tro.big .tro-b{background:radial-gradient(circle at 50% 22%, #FBF0CC 0, transparent 60%);border-radius:22px}
 /* trophées */
 .map .cups circle{fill:var(--surface);stroke:#C9A227;stroke-width:1.6;filter:drop-shadow(0 1px 2px rgba(30,20,10,.35))}
 .map .cups text{font-size:14px;stroke:none;text-anchor:middle}
@@ -256,7 +271,10 @@ dialog.tro::backdrop{background:rgba(30,22,16,.55)}
   dialog.tro[open] .tro-i{animation:cupIn .7s cubic-bezier(.2,1.4,.4,1) both}
   dialog.tro[open] .tro-burst i{animation:burst 1s .15s ease-out both}
   @keyframes cupIn{from{transform:scale(.2) rotate(-25deg);opacity:0}to{transform:none;opacity:1}}
-  @keyframes burst{0%{opacity:1;transform:rotate(var(--a)) translateY(0) scale(1)}100%{opacity:0;transform:rotate(var(--a)) translateY(-120px) scale(.6) rotate(180deg)}}
+  @keyframes burst{0%{opacity:1;transform:rotate(var(--a)) translateY(0) scale(1)}100%{opacity:0;transform:rotate(var(--a)) translateY(calc(-1 * var(--d,120px))) scale(.6) rotate(180deg)}}
+  dialog.tro.big[open] .tro-burst i{animation-duration:1.4s}
+  .map.gold svg{animation:goldIn 1.2s ease-out both}
+  @keyframes goldIn{from{filter:none}}
   /* ouverture d'une fiche */
   .band.enter{animation:bandIn .5s cubic-bezier(.2,.8,.2,1) both}
   .band.enter .row>div>*{animation:fadeUp .5s .15s both}
@@ -569,7 +587,7 @@ function vCarte(){
    <div class="frise" aria-hidden="true"><div class="track"><img src="img/frise.jpg" alt=""><img src="img/frise.jpg" alt=""></div></div>
    <div class="cta d-only"><button class="panel pg" data-go="regions"><span><small>Explorer</small><b>Les 13 régions</b></span><span class="ar">${ICON.chev}</span></button><button class="panel pg" data-go="quiz"><span><small>Réviser</small><b>Le quiz</b></span><span class="ar">${ICON.chev}</span></button></div>
    <p class="intro">Treize régions, treize terroirs. Pour chacune, découvre son identité, ses spécialités, ses fromages et sa cave : tout ce qu’il faut pour conseiller un client et parler de la France gourmande avec assurance.</p>
-   <div class="panel map"><svg viewBox="0 0 340 328" role="group" aria-label="Carte des 13 régions de France">${paths}<g aria-hidden="true">${labels}</g><g class="cups" aria-hidden="true">${cups}</g></svg><p><span class="m-only">Touchez</span><span class="d-only">Cliquez sur</span> une région pour ouvrir sa fiche</p><p class="tro-l">${won.size?`🏆 ${won.size} / 13 trophée${won.size>1?'s':''} gagné${won.size>1?'s':''}`:'Fais 10/10 au quiz d’une région pour gagner son trophée 🏆'}</p></div>
+   <div class="panel map${won.size>=13?' gold':''}"><svg viewBox="0 0 340 328" role="group" aria-label="Carte des 13 régions de France">${paths}<g aria-hidden="true">${labels}</g><g class="cups" aria-hidden="true">${cups}</g></svg><p><span class="m-only">Touchez</span><span class="d-only">Cliquez sur</span> une région pour ouvrir sa fiche</p>${won.size>=13?`<p class="gold-l">🏅 Expert des régions de France</p>${(()=>{ const b=+(store.get('defi-best')||0), m=medalOf(b); return `<button class="final-b" data-final-go>${m?`${m[0]} Défi final : ${b}/20 · Rejouer`:'Relever le défi final'}</button>`; })()}`:`<p class="tro-l">${won.size?`🏆 ${won.size} / 13 trophée${won.size>1?'s':''} gagné${won.size>1?'s':''}`:'Fais 10/10 au quiz d’une région pour gagner son trophée 🏆'}</p>`}</div>
   </div>`;
 }
 
@@ -653,26 +671,29 @@ const firstSentence = t => { const m=String(t).match(/^.*?[a-zà-ÿ0-9)%]{2}[.!?
 const maskName = (t, name) => { const nz=w=>w.normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase().replace(/[^a-z]/g,''); const keys=name.replace(/\(.*?\)/g,'').split(/[\s’'-]+/).map(nz).filter(w=>w.length>=4); return t.split(' ').map(w=>{ const n=nz(w); return keys.some(k=>n.startsWith(k.slice(0,Math.max(4,k.length-1)))) ? '…'+(w.match(/[.,;:)»]+$/)||[''])[0] : w; }).join(' '); };
 function regionOpts(correct){ return shuffle([correct, ...pick(R.filter(x=>x!==correct),3)]).map(x=>({label:x.nom, c:x.c, ok:x===correct})); }
 function buildQuiz(){
-  const pool=[];
-  if(S.qMode==='all'){
-    R.forEach(r=>{
-      r.fro.filter(([n])=>fromCount[n]===1).forEach(([n,p])=>pool.push({q:`Le fromage AOP ${n} vient de quelle région ?`, opts:()=>regionOpts(r), theme:'Fromages AOP', expl:`${n} : ${PATE[p].toLowerCase()}, ${r.nom}.`}));
-      r.spe.filter(s=>speCount[keyN(s)]===1).forEach(s=>pool.push({q:`« ${s} » est une spécialité de quelle région ?`, opts:()=>regionOpts(r), theme:'Spécialités', expl:`${s} : ${r.nom}.`}));
-      drinksOf(r).filter(([n])=>drinkCount[keyN(n)]===1).forEach(([n,desc])=>pool.push({q:`« ${n} » est une boisson de quelle région ?`, opts:()=>regionOpts(r), theme:'Boissons', drink:1, expl:`${n} : ${r.nom}. ${firstSentence(desc)}`}));
-      pool.push({q:`Quelle est la préfecture de la région ${r.nom} ?`, opts:()=>shuffle([r,...pick(R.filter(x=>x!==r),3)]).map(x=>({label:x.pref,ok:x===r})), theme:'Préfectures', expl:`Préfecture de région : ${r.pref}.`});
-    });
-  } else {
-    const r = byId[S.qRegion]; const others = R.filter(x=>x!==r);
+  const pool=[], mode=S.qMode, final = mode==='final';
+  const N = final ? 20 : 10;
+  const addAll = () => R.forEach(r=>{
+    r.fro.filter(([n])=>fromCount[n]===1).forEach(([n,p])=>pool.push({q:`Le fromage AOP ${n} vient de quelle région ?`, opts:()=>regionOpts(r), theme:'Fromages AOP', expl:`${n} : ${PATE[p].toLowerCase()}, ${r.nom}.`}));
+    r.spe.filter(s=>speCount[keyN(s)]===1).forEach(s=>pool.push({q:`« ${s} » est une spécialité de quelle région ?`, opts:()=>regionOpts(r), theme:'Spécialités', expl:`${s} : ${r.nom}.`}));
+    drinksOf(r).filter(([n])=>drinkCount[keyN(n)]===1).forEach(([n,desc])=>pool.push({q:`« ${n} » est une boisson de quelle région ?`, opts:()=>regionOpts(r), theme:'Boissons', drink:1, expl:`${n} : ${r.nom}. ${firstSentence(desc)}`}));
+    pool.push({q:`Quelle est la préfecture de la région ${r.nom} ?`, opts:()=>shuffle([r,...pick(R.filter(x=>x!==r),3)]).map(x=>({label:x.pref,ok:x===r})), theme:'Préfectures', expl:`Préfecture de région : ${r.pref}.`});
+  });
+  const addOne = r => {
+    const others = R.filter(x=>x!==r);
     r.spe.forEach(s=>pool.push({q:`Laquelle est une spécialité de ${r.nom} ?`, opts:()=>shuffle([{label:s,ok:true}, ...pick(others.flatMap(o=>o.spe),3).map(x=>({label:x,ok:false}))]), theme:'Spécialités', expl:`${s} : ${r.nom}.`}));
     r.fro.forEach(([n,p])=>pool.push({q:`Le ${n}, c’est quel type de pâte ?`, opts:()=>shuffle([p,...pick(Object.keys(PATE).filter(k=>k!==p),3)]).map(k=>({label:PATE[k],ok:k===p})), theme:'Fromages AOP', expl:`${n} : ${PATE[p].toLowerCase()}.`}));
     const otherDrinks = others.flatMap(o=>drinksOf(o).map(x=>x[0]));
     drinksOf(r).forEach(([n,desc])=>{
       const clue = maskName(firstSentence(desc), n);
-      pool.push({q:`Quelle boisson de la région correspond à cette description ? « ${clue} »`, opts:()=>shuffle([{label:n,ok:true}, ...pick(otherDrinks,3).map(x=>({label:x,ok:false}))]), theme:'Boissons', drink:1, expl:`${n} : ${firstSentence(desc)}`});
+      pool.push({q:`Quelle boisson ${final?'':'de la région '}correspond à cette description ? « ${clue} »`, opts:()=>shuffle([{label:n,ok:true}, ...pick(otherDrinks,3).map(x=>({label:x,ok:false}))]), theme:'Boissons', drink:1, expl:`${n} : ${firstSentence(desc)}`});
       pool.push({q:`Laquelle de ces boissons est typique de la région ${r.nom} ?`, opts:()=>shuffle([{label:n,ok:true}, ...pick(otherDrinks,3).map(x=>({label:x,ok:false}))]), theme:'Boissons', drink:1, expl:`${n} : ${r.nom}.`});
     });
     if(r.detail) r.detail.deps.forEach(([num,dep,pr])=>pool.push({q:`Quelle est la préfecture du département ${dep} (${num}) ?`, opts:()=>shuffle([pr,...pick(r.detail.deps.filter(x=>x[2]!==pr).map(x=>x[2]),3)]).map(x=>({label:x,ok:x===pr})), theme:'Départements', expl:`${dep} (${num}) : ${pr}.`}));
-  }
+  };
+  if(mode==='all') addAll();
+  else if(mode==='one') addOne(byId[S.qRegion]);
+  else { addAll(); R.forEach(addOne); }
   /* questions photo : reconnaître une spécialité, un fromage ou une boisson */
   const photoItems = r => [
     ...r.spe.filter(s=>(r.speD[s]||{}).img).map(s=>({k:'dish', n:s, img:r.speD[s].img})),
@@ -681,7 +702,7 @@ function buildQuiz(){
   const allNames = {dish:[], cheese:[], drink:[]};
   R.forEach(r=>photoItems(r).forEach(it=>{ if(!allNames[it.k].some(x=>keyN(x)===keyN(it.n))) allNames[it.k].push(it.n); }));
   const QP = {dish:['Quelle est cette spécialité ?','Spécialités en photo'], cheese:['Quel est ce fromage ?','Fromages en photo'], drink:['Quelle est cette boisson ?','Boissons en photo']};
-  (S.qMode==='all' ? R : [byId[S.qRegion]]).forEach(r=>photoItems(r).forEach(it=>{
+  (mode==='one' ? [byId[S.qRegion]] : R).forEach(r=>photoItems(r).forEach(it=>{
     const others = allNames[it.k].filter(x=>keyN(x)!==keyN(it.n));
     pool.push({q:QP[it.k][0], img:it.img, cut:it.k==='drink', bg:r.c, photo:1, theme:QP[it.k][1],
       opts:()=>shuffle([{label:it.n, ok:true}, ...pick(others,3).map(x=>({label:x, ok:false}))]),
@@ -689,33 +710,44 @@ function buildQuiz(){
   }));
   /* questions déjà posées : on les met de côté jusqu'à avoir fait le tour de la réserve */
   const qid = q => q.theme+'|'+q.q+'|'+q.expl;
-  const key = 'quiz-vu-'+(S.qMode==='all'?'toutes':S.qRegion);
+  const key = 'quiz-vu-'+(mode==='all'?'toutes':final?'final':S.qRegion);
   let seen; try{ seen = new Set(JSON.parse(store.get(key)||'[]')); }catch(e){ seen = new Set(); }
   let fresh = pool.filter(q=>!seen.has(qid(q)));
-  if(fresh.length < 10){ seen = new Set(); }
+  if(fresh.length < N){ seen = new Set(); }
   /* une même spécialité, un même fromage ou une même boisson ne revient pas deux fois dans une série */
   const named = q => q.photo || q.drink || q.theme==='Spécialités' || q.theme==='Fromages AOP';
   const item = q => named(q) ? keyN(q.expl.split(' :')[0]) : qid(q);
   const chosen = [];
   const fits = q => !chosen.includes(q) && !chosen.some(c=>item(c)===item(q));
-  const fill = (list, max, flag) => { for(const q of shuffle(list)){ if(chosen.length>=10 || (flag && chosen.filter(c=>c[flag]).length>=max)) break; if(fits(q)) chosen.push(q); } };
-  fill(fresh.filter(q=>q.photo), 3, 'photo');
-  fill(fresh.filter(q=>q.drink), S.qMode==='one'?3:2, 'drink');
+  const fill = (list, max, test) => { let k=0; for(const q of shuffle(list)){ if(chosen.length>=N || (max && k>=max)) break; if(fits(q)){ chosen.push(q); k++; } } };
+  /* défi final : plus de photos, de descriptions de boissons et de départements */
+  fill(fresh.filter(q=>q.photo), final?5:3);
+  fill(fresh.filter(q=>q.drink), final?4:mode==='one'?3:2);
+  if(final) fill(fresh.filter(q=>q.theme==='Départements'), 4);
   fill(fresh.filter(q=>!q.photo && !q.drink));
-  if(chosen.length < 10) fill(pool);
+  if(chosen.length < N) fill(pool);
   chosen.forEach(q=>seen.add(qid(q)));
   store.set(key, JSON.stringify([...seen]));
-  const qs = shuffle(chosen).slice(0,10).map(q=>({...q, opts:q.opts()}));
+  const qs = shuffle(chosen).slice(0,N).map(q=>({...q, opts:q.opts()}));
   S.quiz = {qs, i:0, score:0, answered:null};
 }
 function vQuiz(){
+  const nWon = trophies().size, open13 = nWon>=13;
+  const top = `<div class="narrow"><div class="head"><div class="kicker">Révision</div><h1>${S.qMode==='final'?'Le défi final':'Le quiz'}</h1>${stroke(90)}</div>
+  <div class="stack"><div class="seg seg3" role="group" aria-label="Choix du quiz">
+   <button aria-pressed="${S.qMode==='all'}" data-qmode="all">Toutes les régions</button>
+   <button aria-pressed="${S.qMode==='one'}" data-qmode="one">Une région</button>
+   <button aria-pressed="${S.qMode==='final'}" data-qmode="final">${open13?'🏅':'🔒'} Défi final</button></div>
+   ${S.qMode==='one'?`<div><label class="l" for="qregion">Région à réviser</label><select id="qregion">${R.map(r=>`<option value="${r.id}" ${r.id===S.qRegion?'selected':''}>${esc(r.nom)}</option>`).join('')}</select></div>`:''}`;
+  if(S.qMode==='final' && !open13){
+    return top + `<div class="panel lock"><div class="lock-i" aria-hidden="true">🔒</div><h2>Le défi final</h2><p>20 questions plus difficiles, toutes régions mélangées : départements, photos, descriptions de boissons. Il s’ouvre quand tu as gagné les 13 trophées.</p><p class="tro-n">${nWon} / 13 trophées</p><div class="lock-bar" role="progressbar" aria-label="Trophées gagnés" aria-valuemin="0" aria-valuemax="13" aria-valuenow="${nWon}"><i style="width:${nWon/13*100}%"></i></div><button class="btn" data-qmode="one">Gagner des trophées</button></div></div></div>`;
+  }
   if(!S.quiz) buildQuiz();
   const z=S.quiz, total=z.qs.length;
-  const top = `<div class="narrow"><div class="head"><div class="kicker">Révision</div><h1>Le quiz</h1>${stroke(90)}</div>
-  <div class="stack"><div class="seg" role="group" aria-label="Choix du quiz">
-   <button aria-pressed="${S.qMode==='all'}" data-qmode="all">Toutes les régions</button>
-   <button aria-pressed="${S.qMode==='one'}" data-qmode="one">Une région</button></div>
-   ${S.qMode==='one'?`<div><label class="l" for="qregion">Région à réviser</label><select id="qregion">${R.map(r=>`<option value="${r.id}" ${r.id===S.qRegion?'selected':''}>${esc(r.nom)}</option>`).join('')}</select></div>`:''}`;
+  if(z.i>=total && S.qMode==='final'){
+    const m = medalOf(z.score), best = +(store.get('defi-best')||0);
+    return top + `<div class="panel score"><div class="kicker">Résultat du défi</div><div class="n">${z.score}/${total}</div><p class="muted" style="margin:0">${m?`${m[0]} ${m[1]}`:'Pas de médaille cette fois : il faut 14/20 pour le bronze.'}${best?` · Ton record : ${best}/20`:''}</p></div><button class="btn" data-restart>Nouveau défi</button></div></div>`;
+  }
   if(z.i>=total){
     const msg = z.score>=8?'Excellent, la région n’a plus de secret pour vous.':z.score>=5?'Bon travail. Encore une série pour consolider ?':'Relisez les fiches, puis retentez une série.';
     return top + `<div class="panel score"><div class="kicker">Résultat</div><div class="n">${z.score}/${total}</div><p class="muted" style="margin:0">${msg}</p></div><button class="btn" data-restart>Nouvelle série</button></div></div>`;
@@ -777,21 +809,43 @@ function render(){
 }
 const pop = document.getElementById('pop');
 const tro = document.getElementById('tro');
+const MEDALS = [[20,'🥇','Médaille d’or'],[17,'🥈','Médaille d’argent'],[14,'🥉','Médaille de bronze']];
+function medalOf(s){ const m = MEDALS.find(([min])=>s>=min); return m ? [m[1], m[2]] : null; }
+function burst(n, big){ return Array.from({length:n},(_,i)=>`<i style="background:${R[i%R.length].c};--a:${i*360/n}deg;--d:${big?90+(i*37)%110:120}px;animation-delay:${big?(i%3)*.12+.1:.15}s"></i>`).join(''); }
+function showTro(html, big){
+  tro.classList.toggle('big', !!big);
+  tro.innerHTML = typo(html);
+  try{ tro.showModal(); }catch(e){ tro.setAttribute('open',''); }
+  (tro.querySelector('[data-final]')||tro.querySelector('[data-trogo]')||tro.querySelector('[data-troclose]')).focus();
+}
 function checkTrophy(z){
+  if(S.qMode==='final'){
+    const best = +(store.get('defi-best')||0); if(z.score>best) store.set('defi-best', z.score);
+    const m = medalOf(z.score); if(!m) return;
+    showTro(`<div class="tro-b"><div class="tro-burst" aria-hidden="true">${burst(20, z.score===20)}</div><div class="tro-i" aria-hidden="true">${m[0]}</div>
+     <h2 id="tro-title">${m[1]} !</h2><p>${z.score}/20 au défi final.${z.score>best&&best?' Nouveau record !':''}</p>
+     <div class="tro-a"><button class="btn" data-trogo>Voir la carte</button><button class="tro-x" data-troclose>Continuer</button></div></div>`, z.score===20);
+    return;
+  }
   if(S.qMode!=='one' || z.score!==z.qs.length) return;
   const r = byId[S.qRegion], won = trophies(), already = won.has(r.id);
   won.add(r.id); store.set('trophees', JSON.stringify([...won]));
-  const dots = R.map((x,i)=>`<i style="background:${x.c};--a:${i*360/R.length}deg"></i>`).join('');
-  tro.innerHTML = typo(`<div class="tro-b"><div class="tro-burst" aria-hidden="true">${dots}</div><div class="tro-i" aria-hidden="true">🏆</div>
+  if(!already && won.size===13){
+    showTro(`<div class="tro-b"><div class="tro-burst" aria-hidden="true">${burst(40, true)}</div><div class="tro-i" aria-hidden="true">🏅</div>
+     <p class="tro-n">13 / 13 trophées</p><h2 id="tro-title">Expert des régions de France !</h2>
+     <p>Tu as réussi le quiz des 13 régions sans une seule faute. La carte est passée en or, et le <b>défi final</b> est débloqué : 20 questions plus difficiles pour décrocher une médaille.</p>
+     <div class="tro-a"><button class="btn" data-final>Lancer le défi final</button><button class="tro-x" data-trogo>Voir ma carte en or</button></div></div>`, true);
+    return;
+  }
+  showTro(`<div class="tro-b"><div class="tro-burst" aria-hidden="true">${burst(13)}</div><div class="tro-i" aria-hidden="true">🏆</div>
    <h2 id="tro-title">${already?'Encore un sans-faute !':'Trophée gagné !'}</h2>
    <p>10/10 au quiz <b>${esc(r.nom)}</b>. ${already?'Tu avais déjà ce trophée, il t’attend sur la carte.':'Ton trophée est maintenant sur la carte.'}</p>
    <p class="tro-n">${won.size} / 13 trophée${won.size>1?'s':''}</p>
    <div class="tro-a"><button class="btn" data-trogo>Voir la carte</button><button class="tro-x" data-troclose>Continuer</button></div></div>`);
-  try{ tro.showModal(); }catch(e){ tro.setAttribute('open',''); }
-  tro.querySelector('[data-trogo]').focus();
 }
 tro.addEventListener('click', e=>{
   if(e.target.closest('[data-trogo]')){ tro.close(); go('carte'); }
+  else if(e.target.closest('[data-final]')){ tro.close(); S.qMode='final'; S.quiz=null; render(); window.scrollTo(0,0); }
   else if(e.target.closest('[data-troclose]') || e.target===tro) tro.close();
 });
 function openDish(name, rid){
@@ -845,6 +899,7 @@ pop.addEventListener('keydown',e=>{ if(PL.list.length<2) return; if(e.key==='Arr
 })();
 
 document.addEventListener('click',e=>{
+  if(e.target.closest('[data-final-go]')){ S.qMode='final'; S.quiz=null; go('quiz'); return; }
   const op=e.target.closest('[data-dish],[data-drink],[data-cheese]');
   if(op && !op.closest('#pop')){ startPop(op); return; }
   const qz=e.target.closest('[data-quizregion]');

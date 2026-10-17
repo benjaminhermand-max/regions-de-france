@@ -229,6 +229,43 @@ dialog.pop::backdrop{background:rgba(30,22,16,.55)}
 .pop .reg i{width:10px;height:10px;border-radius:50%}
 @media (prefers-reduced-motion: no-preference){ dialog.pop[open]{animation:pop .2s ease-out} @keyframes pop{from{transform:translateY(12px);opacity:0}to{transform:none;opacity:1}} }
 
+/* quiz photo */
+.qimg{display:flex;align-items:center;justify-content:center;border-radius:14px;padding:18px;min-height:180px}
+.qimg img{display:block;max-width:min(100%,300px);max-height:240px;border-radius:12px;background:#fff;box-shadow:0 6px 16px rgba(30,20,10,.22)}
+.qimg.cut img{background:transparent;box-shadow:none;max-height:260px;filter:drop-shadow(0 8px 10px rgba(30,20,10,.3))}
+/* trophées */
+.map .cups circle{fill:var(--surface);stroke:#C9A227;stroke-width:1.6;filter:drop-shadow(0 1px 2px rgba(30,20,10,.35))}
+.map .cups text{font-size:14px;stroke:none;text-anchor:middle}
+.map p.tro-l{margin-top:6px;font-size:14px;font-weight:700;color:var(--accent)}
+.card{position:relative}
+.card .cup{position:absolute;top:8px;right:8px;width:36px;height:36px;border-radius:50%;background:var(--surface);display:grid;place-items:center;font-size:19px;box-shadow:0 2px 8px rgba(30,20,10,.2)}
+dialog.tro{border:0;padding:0;border-radius:22px;background:var(--surface);color:var(--ink);width:min(380px,calc(100vw - 32px));box-shadow:0 18px 50px rgba(30,20,10,.35);overflow:visible}
+dialog.tro::backdrop{background:rgba(30,22,16,.55)}
+.tro-b{position:relative;padding:34px 24px 24px;display:flex;flex-direction:column;align-items:center;text-align:center;gap:8px}
+.tro-i{font-size:76px;line-height:1;position:relative;z-index:1}
+.tro-b h2{font-size:28px}
+.tro-b p{margin:0}
+.tro-n{font-weight:700;color:var(--accent);font-size:14px;letter-spacing:.06em;text-transform:uppercase}
+.tro-a{display:flex;flex-direction:column;gap:8px;width:100%;margin-top:10px}
+.tro-x{min-height:44px;border:0;background:none;font-weight:700;color:var(--muted);cursor:pointer}
+.tro-burst{position:absolute;left:50%;top:72px;width:0;height:0}
+.tro-burst i{position:absolute;width:10px;height:10px;border-radius:3px;opacity:0}
+@media (prefers-reduced-motion: no-preference){
+  dialog.tro[open] .tro-i{animation:cupIn .7s cubic-bezier(.2,1.4,.4,1) both}
+  dialog.tro[open] .tro-burst i{animation:burst 1s .15s ease-out both}
+  @keyframes cupIn{from{transform:scale(.2) rotate(-25deg);opacity:0}to{transform:none;opacity:1}}
+  @keyframes burst{0%{opacity:1;transform:rotate(var(--a)) translateY(0) scale(1)}100%{opacity:0;transform:rotate(var(--a)) translateY(-120px) scale(.6) rotate(180deg)}}
+  /* ouverture d'une fiche */
+  .band.enter{animation:bandIn .5s cubic-bezier(.2,.8,.2,1) both}
+  .band.enter .row>div>*{animation:fadeUp .5s .15s both}
+  .band.enter img{animation:imgIn .7s .2s cubic-bezier(.2,1.3,.4,1) both}
+  .enter-c{animation:fadeUp .45s .3s both}
+  .enter-c2{animation:fadeUp .5s .4s both}
+  @keyframes bandIn{from{clip-path:inset(0 0 100% 0 round 0 0 22px 22px)}to{clip-path:inset(0 0 0 0 round 0)}}
+  @keyframes fadeUp{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:none}}
+  @keyframes imgIn{from{opacity:0;transform:scale(.6) rotate(-8deg)}to{opacity:1;transform:none}}
+}
+
 /* navigation */
 nav.tabbar{position:fixed;left:0;right:0;bottom:0;background:var(--surface);border-top:1px solid var(--line);padding:8px max(8px,env(safe-area-inset-right,0px)) calc(10px + env(safe-area-inset-bottom,0px)) max(8px,env(safe-area-inset-left,0px));z-index:5}
 .totop{position:fixed;right:max(16px,env(safe-area-inset-right,0px));bottom:calc(86px + env(safe-area-inset-bottom,0px));width:48px;height:48px;border-radius:50%;border:1px solid var(--line);background:var(--surface);color:var(--accent);display:grid;place-items:center;box-shadow:0 6px 18px rgba(43,36,32,.18);cursor:pointer;z-index:20;opacity:0;transform:translateY(10px);pointer-events:none;transition:opacity .2s,transform .2s}
@@ -335,6 +372,7 @@ nav.tabbar .brand{display:none}
 
 <main class="app" id="view" aria-live="polite"></main>
 <dialog class="pop" id="pop" aria-labelledby="pop-title"></dialog>
+<dialog class="tro" id="tro" aria-labelledby="tro-title"></dialog>
 <button class="totop" id="totop" aria-label="Remonter en haut de la page" tabindex="-1"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 19V5M5 12l7-7 7 7"/></svg></button>
 <nav class="tabbar" aria-label="Navigation principale"><div class="in">
   <button class="brand" data-go="carte" aria-label="Accueil, Régions de France"><img src="img/icone/favicon-64.png" alt="" width="34" height="34"><span>Régions de France</span></button>
@@ -464,7 +502,7 @@ const snap = d => ({view:S.view, region:S.region, tab:S.tab, d});
 let skipBack = false, fromHist = false;
 function show(v, opts){
   Object.assign(S, {view:v}, opts);
-  if(v==='region'){ store.set('derniere', S.region); }
+  if(v==='region'){ store.set('derniere', S.region); S.anim = true; }
   render(); window.scrollTo(0,0);
 }
 function go(v, opts={}, push){
@@ -481,31 +519,35 @@ window.addEventListener('popstate', e=>{
   const s = e.state; if(!s) return;
   if(s.pop){ if(!pop.open) history.back(); return; }
   if(pop.open){ fromHist = true; pop.close(); fromHist = false; }
+  if(tro.open) tro.close();
   if(s.view!==S.view || s.region!==S.region || s.tab!==S.tab){ Object.assign(S, {view:s.view, region:s.region, tab:s.tab}); render(); window.scrollTo(0,0); }
 });
 
 /* ---------- Carte ---------- */
 function vCarte(){
   const paths = R.map(r=>`<a href="#" data-region="${r.id}" class="${r.id==='ara'?'home':''}" aria-label="${esc(r.nom)}"><path fill="${r.c}" d="${MAP[r.code]}"/></a>`).join('');
+  const won = trophies();
+  const cups = LABELS.filter(([code])=>R.some(r=>r.code===code && won.has(r.id))).map(([code,x,y])=>`<g transform="translate(${x} ${y-20})"><circle r="11.5"></circle><text y="5.5">🏆</text></g>`).join('');
   const labels = LABELS.map(([code,x,y,lines])=>`<text x="${x}" y="${y}">${lines.map((l,i)=>`<tspan x="${x}" dy="${i?10:0}">${esc(l)}</tspan>`).join('')}</text>`).join('');
   return `<div class="home"><div class="head"><h1>La France et ses régions</h1>${stroke(150)}</div>
    <div class="frise" aria-hidden="true"><div class="track"><img src="img/frise.jpg" alt=""><img src="img/frise.jpg" alt=""></div></div>
    <div class="cta d-only"><button class="panel pg" data-go="regions"><span><small>Explorer</small><b>Les 13 régions</b></span><span class="ar">${ICON.chev}</span></button><button class="panel pg" data-go="quiz"><span><small>Réviser</small><b>Le quiz</b></span><span class="ar">${ICON.chev}</span></button></div>
    <p class="intro">Treize régions, treize terroirs. Pour chacune, découvre son identité, ses spécialités, ses fromages et sa cave : tout ce qu’il faut pour conseiller un client et parler de la France gourmande avec assurance.</p>
-   <div class="panel map"><svg viewBox="0 0 340 328" role="group" aria-label="Carte des 13 régions de France">${paths}<g aria-hidden="true">${labels}</g></svg><p><span class="m-only">Touchez</span><span class="d-only">Cliquez sur</span> une région pour ouvrir sa fiche</p></div>
+   <div class="panel map"><svg viewBox="0 0 340 328" role="group" aria-label="Carte des 13 régions de France">${paths}<g aria-hidden="true">${labels}</g><g class="cups" aria-hidden="true">${cups}</g></svg><p><span class="m-only">Touchez</span><span class="d-only">Cliquez sur</span> une région pour ouvrir sa fiche</p><p class="tro-l">${won.size?`🏆 ${won.size} / 13 trophée${won.size>1?'s':''} gagné${won.size>1?'s':''}`:'Fais 10/10 au quiz d’une région pour gagner son trophée 🏆'}</p></div>
   </div>`;
 }
 
 /* ---------- Liste ---------- */
 function vRegions(){
   return `<div class="head"><div class="kicker">Carnet de route · 13 régions</div><h1>Toutes les régions</h1>${stroke(140)}</div>
-  <div class="grid">${R.map(r=>`<button class="card" data-region="${r.id}"><img src="${r.img}" alt="" loading="lazy"><span style="border-top-color:${r.c}">${esc(r.nom)}</span></button>`).join('')}</div>`;
+  <div class="grid">${R.map(r=>`<button class="card" data-region="${r.id}">${trophies().has(r.id)?'<span class="cup" role="img" aria-label="Trophée gagné">🏆</span>':''}<img src="${r.img}" alt="" loading="lazy"><span style="border-top-color:${r.c}">${esc(r.nom)}</span></button>`).join('')}</div>`;
 }
 
 /* ---------- Fiche ---------- */
 function vRegion(){
   const r = byId[S.region]; const d = r.detail; const i = R.indexOf(r); const nx = R[(i+1)%R.length];
-  const band = `<div class="band" style="background:${r.c}"><button class="back" data-go="regions">${ICON.back}Régions</button>
+  const en = S.anim ? ' enter' : '';
+  const band = `<div class="band${en}" style="background:${r.c}"><button class="back" data-go="regions">${ICON.back}Régions</button>
    <div class="row"><div><span class="kick">${r.id==='ara'?'Notre région':'Région '+(i+1)+' du cours'}</span><h1>${esc(r.nom)}</h1><p>${d?d.deps.length+' départements · ':''}Préfecture : ${esc(r.pref)}</p></div><img src="${r.img}" alt=""></div></div>`;
   let body;
   if(!d){
@@ -514,14 +556,14 @@ function vRegion(){
      ${secAssiette(r,false)}${r.fro.length?secPlateau(r):''}</div>`;
   } else {
     const tabs = [['identite','Identité'],['assiette','Spécialités'],['fromage','Fromages'],['cave','Cave']];
-    const t = `<div class="tabs" role="tablist" aria-label="Rubriques de la fiche">${tabs.map(([k,l])=>`<button role="tab" id="tab-${k}" aria-selected="${S.tab===k}" data-tab="${k}">${l}</button>`).join('')}</div>`;
+    const t = `<div class="tabs${en?' enter-c':''}" role="tablist" aria-label="Rubriques de la fiche">${tabs.map(([k,l])=>`<button role="tab" id="tab-${k}" aria-selected="${S.tab===k}" data-tab="${k}">${l}</button>`).join('')}</div>`;
     const content = {identite:secIdentite, assiette:r=>secAssiette(r,true), fromage:secPlateau, cave:secCave}[S.tab](r);
     const k = tabs.findIndex(([x])=>x===S.tab), pv = tabs[k-1], nt = tabs[k+1];
     const pager = `<nav class="pager" aria-label="Rubrique précédente ou suivante">
       ${pv?`<button class="panel pg" data-tab="${pv[0]}" data-top><span class="ar">${ICON.back}</span><span><small>Précédent</small><b>${pv[1]}</b></span></button>`:'<span></span>'}
       ${nt?`<button class="panel pg nx" data-tab="${nt[0]}" data-top><span><small>Suivant</small><b>${nt[1]}</b></span><span class="ar">${ICON.chev}</span></button>`:`<button class="panel pg nx" data-quizregion="${r.id}"><span><small>Se tester</small><b>Quiz ${esc(r.court)}</b></span><span class="ar">${ICON.chev}</span></button>`}
     </nav>`;
-    body = `${t}<div class="stack" role="tabpanel" aria-labelledby="tab-${S.tab}">${content}</div>${pager}`;
+    body = `${t}<div class="stack${en?' enter-c2':''}" role="tabpanel" aria-labelledby="tab-${S.tab}">${content}</div>${pager}`;
   }
   return band + body;
 }
@@ -563,6 +605,8 @@ function secCave(r){
 }
 
 /* ---------- Quiz ---------- */
+/* trophées : 10/10 au quiz d'une région */
+const trophies = () => { try{ return new Set(JSON.parse(store.get('trophees')||'[]')); }catch(e){ return new Set(); } };
 const shuffle = a => { a=[...a]; for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]]} return a; };
 const pick = (a,n) => shuffle(a).slice(0,n);
 const fromCount = {}; R.forEach(r=>r.fro.forEach(([n])=>fromCount[n]=(fromCount[n]||0)+1));
@@ -593,17 +637,36 @@ function buildQuiz(){
     });
     if(r.detail) r.detail.deps.forEach(([num,dep,pr])=>pool.push({q:`Quelle est la préfecture du département ${dep} (${num}) ?`, opts:()=>shuffle([pr,...pick(r.detail.deps.filter(x=>x[2]!==pr).map(x=>x[2]),3)]).map(x=>({label:x,ok:x===pr})), theme:'Départements', expl:`${dep} (${num}) : ${pr}.`}));
   }
+  /* questions photo : reconnaître une spécialité, un fromage ou une boisson */
+  const photoItems = r => [
+    ...r.spe.filter(s=>(r.speD[s]||{}).img).map(s=>({k:'dish', n:s, img:r.speD[s].img})),
+    ...r.fro.filter(([n])=>(r.froD[n]||{}).img).map(([n,p])=>({k:'cheese', n, p, img:r.froD[n].img})),
+    ...drinksOf(r).filter(b=>b[2]).map(([n,,img])=>({k:'drink', n, img}))];
+  const allNames = {dish:[], cheese:[], drink:[]};
+  R.forEach(r=>photoItems(r).forEach(it=>{ if(!allNames[it.k].some(x=>keyN(x)===keyN(it.n))) allNames[it.k].push(it.n); }));
+  const QP = {dish:['Quelle est cette spécialité ?','Spécialités en photo'], cheese:['Quel est ce fromage ?','Fromages en photo'], drink:['Quelle est cette boisson ?','Boissons en photo']};
+  (S.qMode==='all' ? R : [byId[S.qRegion]]).forEach(r=>photoItems(r).forEach(it=>{
+    const others = allNames[it.k].filter(x=>keyN(x)!==keyN(it.n));
+    pool.push({q:QP[it.k][0], img:it.img, cut:it.k==='drink', bg:r.c, photo:1, theme:QP[it.k][1],
+      opts:()=>shuffle([{label:it.n, ok:true}, ...pick(others,3).map(x=>({label:x, ok:false}))]),
+      expl: it.k==='cheese' ? `${it.n} : ${PATE[it.p].toLowerCase()}, ${r.nom}.` : `${it.n} : ${r.nom}.`});
+  }));
   /* questions déjà posées : on les met de côté jusqu'à avoir fait le tour de la réserve */
   const qid = q => q.theme+'|'+q.q+'|'+q.expl;
   const key = 'quiz-vu-'+(S.qMode==='all'?'toutes':S.qRegion);
   let seen; try{ seen = new Set(JSON.parse(store.get(key)||'[]')); }catch(e){ seen = new Set(); }
   let fresh = pool.filter(q=>!seen.has(qid(q)));
   if(fresh.length < 10){ seen = new Set(); }
-  const item = q => q.expl.split(' :')[0];
-  const nd = S.qMode==='one'?3:2;
-  const dq = pick(fresh.filter(q=>q.drink), nd);
-  let chosen = [...dq, ...pick(fresh.filter(q=>!dq.includes(q) && !(q.drink && dq.some(d=>item(d)===item(q)))), Math.max(0, 10-dq.length))];
-  if(chosen.length < 10) chosen = chosen.concat(pick(pool.filter(q=>!chosen.includes(q) && !chosen.some(c=>c.drink && q.drink && item(c)===item(q))), 10-chosen.length));
+  /* une même spécialité, un même fromage ou une même boisson ne revient pas deux fois dans une série */
+  const named = q => q.photo || q.drink || q.theme==='Spécialités' || q.theme==='Fromages AOP';
+  const item = q => named(q) ? keyN(q.expl.split(' :')[0]) : qid(q);
+  const chosen = [];
+  const fits = q => !chosen.includes(q) && !chosen.some(c=>item(c)===item(q));
+  const fill = (list, max, flag) => { for(const q of shuffle(list)){ if(chosen.length>=10 || (flag && chosen.filter(c=>c[flag]).length>=max)) break; if(fits(q)) chosen.push(q); } };
+  fill(fresh.filter(q=>q.photo), 3, 'photo');
+  fill(fresh.filter(q=>q.drink), S.qMode==='one'?3:2, 'drink');
+  fill(fresh.filter(q=>!q.photo && !q.drink));
+  if(chosen.length < 10) fill(pool);
   chosen.forEach(q=>seen.add(qid(q)));
   store.set(key, JSON.stringify([...seen]));
   const qs = shuffle(chosen).slice(0,10).map(q=>({...q, opts:q.opts()}));
@@ -629,7 +692,7 @@ function vQuiz(){
   }).join('');
   const fb = a===null ? '' : (q.opts[a].ok ? `<p class="fb good"><strong>Bonne réponse.</strong> ${esc(q.expl)}</p>` : `<p class="fb bad"><strong>Raté.</strong> ${esc(q.expl)}</p>`);
   return top + `<div class="prog"><div class="l"><span>Question ${z.i+1} sur ${total}</span><span>${q.theme}</span></div><div class="bar" role="progressbar" aria-label="Avancement du quiz" aria-valuemin="0" aria-valuemax="${total}" aria-valuenow="${z.i}"><i style="width:${z.i/total*100}%"></i></div></div>
-   <div class="panel q"><p class="ques">${esc(q.q)}</p><div class="opts">${opts}</div>${fb}</div>
+   <div class="panel q">${q.img?`<div class="qimg${q.cut?' cut':''}" style="background:${q.bg}"><img src="${q.img}" alt="Photo à identifier"></div>`:''}<p class="ques">${esc(q.q)}</p><div class="opts">${opts}</div>${fb}</div>
    ${a!==null?`<button class="btn" data-nextq>${z.i+1<total?'Question suivante':'Voir mon résultat'}</button>`:''}</div></div>`;
 }
 
@@ -665,6 +728,7 @@ function renderGlossList(){
 /* ---------- Rendu & événements ---------- */
 function render(){
   view.innerHTML = typo({carte:vCarte, regions:vRegions, region:vRegion, quiz:vQuiz, glossaire:vGlossaire}[S.view]());
+  S.anim = false;
   const navView = S.view==='region' ? 'regions' : S.view;
   document.querySelectorAll('nav.tabbar button').forEach(b=>{ if(b.dataset.go===navView) b.setAttribute('aria-current','page'); else b.removeAttribute('aria-current'); });
   if(S.view==='glossaire'){
@@ -676,6 +740,24 @@ function render(){
   if(sel) sel.addEventListener('change',e=>{S.qRegion=e.target.value; S.quiz=null; render();});
 }
 const pop = document.getElementById('pop');
+const tro = document.getElementById('tro');
+function checkTrophy(z){
+  if(S.qMode!=='one' || z.score!==z.qs.length) return;
+  const r = byId[S.qRegion], won = trophies(), already = won.has(r.id);
+  won.add(r.id); store.set('trophees', JSON.stringify([...won]));
+  const dots = R.map((x,i)=>`<i style="background:${x.c};--a:${i*360/R.length}deg"></i>`).join('');
+  tro.innerHTML = typo(`<div class="tro-b"><div class="tro-burst" aria-hidden="true">${dots}</div><div class="tro-i" aria-hidden="true">🏆</div>
+   <h2 id="tro-title">${already?'Encore un sans-faute !':'Trophée gagné !'}</h2>
+   <p>10/10 au quiz <b>${esc(r.nom)}</b>. ${already?'Tu avais déjà ce trophée, il t’attend sur la carte.':'Ton trophée est maintenant sur la carte.'}</p>
+   <p class="tro-n">${won.size} / 13 trophée${won.size>1?'s':''}</p>
+   <div class="tro-a"><button class="btn" data-trogo>Voir la carte</button><button class="tro-x" data-troclose>Continuer</button></div></div>`);
+  try{ tro.showModal(); }catch(e){ tro.setAttribute('open',''); }
+  tro.querySelector('[data-trogo]').focus();
+}
+tro.addEventListener('click', e=>{
+  if(e.target.closest('[data-trogo]')){ tro.close(); go('carte'); }
+  else if(e.target.closest('[data-troclose]') || e.target===tro) tro.close();
+});
 function openDish(name, rid){
   const r=byId[rid], d=r.speD[name];
   const ph = d.img ? `<div class="pic" style="background:${r.c}"><img src="${d.img}" alt="${esc(name)}"></div>` : `<div class="none" style="background:${r.c}">${ICON.plate}<div>${esc(name)}</div><span>Photo à venir</span></div>`;
@@ -739,7 +821,7 @@ document.addEventListener('click',e=>{
   else if(t.dataset.go){ go(t.dataset.go); }
   else if(t.dataset.tab){ const top=t.hasAttribute('data-top'); S.tab=t.dataset.tab; render(); try{ history.replaceState(snap(hs().d||0), ''); }catch(err){} const tb=document.getElementById('tab-'+S.tab); if(top){ window.scrollTo(0,0); tb?.focus({preventScroll:true}); } else tb?.focus(); }
   else if(t.dataset.ans!==undefined){ const z=S.quiz; z.answered=+t.dataset.ans; if(z.qs[z.i].opts[z.answered].ok) z.score++; render(); }
-  else if(t.hasAttribute('data-nextq')){ const z=S.quiz; z.i++; z.answered=null; render(); }
+  else if(t.hasAttribute('data-nextq')){ const z=S.quiz; z.i++; z.answered=null; render(); if(z.i>=z.qs.length) checkTrophy(z); }
   else if(t.hasAttribute('data-restart')){ S.quiz=null; render(); }
   else if(t.dataset.qmode){ S.qMode=t.dataset.qmode; S.quiz=null; render(); }
   else if(t.dataset.gfilter){ S.gFilter=t.dataset.gfilter; document.querySelectorAll('[data-gfilter]').forEach(b=>b.setAttribute('aria-pressed',b===t)); renderGlossList(); }

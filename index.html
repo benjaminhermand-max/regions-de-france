@@ -235,6 +235,16 @@ dialog.pop::backdrop{background:rgba(30,22,16,.55)}
 .qimg{display:flex;align-items:center;justify-content:center;border-radius:14px;padding:18px;min-height:180px}
 .qimg img{display:block;max-width:min(100%,300px);max-height:240px;border-radius:12px;background:#fff;box-shadow:0 6px 16px rgba(30,20,10,.22)}
 .qimg.cut img{background:transparent;box-shadow:none;max-height:260px;filter:drop-shadow(0 8px 10px rgba(30,20,10,.3))}
+/* toque d'or */
+.mrow{display:flex;align-items:center;gap:14px}
+.mrow h1{color:#7A5C0E}
+.toque{width:68px;height:68px;flex-shrink:0;filter:drop-shadow(0 4px 8px rgba(156,122,22,.45))}
+.tro-toque .toque{width:104px;height:104px}
+.toque-f{display:flex;flex-direction:column;gap:6px;width:100%;text-align:left;margin-top:8px}
+.toque-f input{min-height:48px;border-radius:12px;border:1px solid var(--line);background:var(--paper);padding:0 14px;font:inherit;font-weight:600;color:var(--ink)}
+.toque-f .btn{margin-top:6px}
+@media (min-width:1024px){ .toque{width:86px;height:86px} }
+@media (prefers-reduced-motion: no-preference){ .mrow .toque{animation:toqueBob 3.5s ease-in-out infinite} @keyframes toqueBob{0%,100%{transform:translateY(0) rotate(-3deg)}50%{transform:translateY(-4px) rotate(3deg)}} }
 /* défi final et carte dorée */
 .seg.seg3{grid-template-columns:repeat(3,minmax(0,1fr))}
 .seg.seg3 button{line-height:1.15;padding:4px 6px;font-size:15px}
@@ -583,7 +593,8 @@ function vCarte(){
   const won = trophies();
   const cups = LABELS.filter(([code])=>R.some(r=>r.code===code && won.has(r.id))).map(([code,x,y])=>`<g transform="translate(${x} ${y-20})"><circle r="11.5"></circle><text y="5.5">🏆</text></g>`).join('');
   const labels = LABELS.map(([code,x,y,lines])=>`<text x="${x}" y="${y}">${lines.map((l,i)=>`<tspan x="${x}" dy="${i?10:0}">${esc(l)}</tspan>`).join('')}</text>`).join('');
-  return `<div class="home"><div class="head"><h1>La France et ses régions</h1>${stroke(150)}</div>
+  const maitre = store.get('maitre'), mNom = store.get('maitre-nom')||'';
+  return `<div class="home">${maitre?`<div class="head master"><div class="mrow">${TOQUE}<div><div class="kicker">${mNom?esc(mNom)+' · ':''}20/20 au défi final</div><h1>Maître des régions</h1></div></div>${stroke(150)}</div>`:`<div class="head"><h1>La France et ses régions</h1>${stroke(150)}</div>`}
    <div class="frise" aria-hidden="true"><div class="track"><img src="img/frise.jpg" alt=""><img src="img/frise.jpg" alt=""></div></div>
    <div class="cta d-only"><button class="panel pg" data-go="regions"><span><small>Explorer</small><b>Les 13 régions</b></span><span class="ar">${ICON.chev}</span></button><button class="panel pg" data-go="quiz"><span><small>Réviser</small><b>Le quiz</b></span><span class="ar">${ICON.chev}</span></button></div>
    <p class="intro">Treize régions, treize terroirs. Pour chacune, découvre son identité, ses spécialités, ses fromages et sa cave : tout ce qu’il faut pour conseiller un client et parler de la France gourmande avec assurance.</p>
@@ -809,6 +820,7 @@ function render(){
 }
 const pop = document.getElementById('pop');
 const tro = document.getElementById('tro');
+const TOQUE = `<svg class="toque" viewBox="0 0 64 64" aria-hidden="true"><defs><linearGradient id="tg" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#FBEA8E"></stop><stop offset=".5" stop-color="#D4AF37"></stop><stop offset="1" stop-color="#9C7A16"></stop></linearGradient></defs><path d="M18 40c-7 0-12-5-12-11.5S11 17 17.5 17c1.5-6.5 7.2-11 14.5-11s13 4.5 14.5 11C53 17 58 22 58 28.5S53 40 46 40z" fill="url(#tg)" stroke="#7A5C0E" stroke-width="2" stroke-linejoin="round"></path><rect x="17" y="40" width="30" height="14" rx="2.5" fill="url(#tg)" stroke="#7A5C0E" stroke-width="2"></rect><path d="M26 41v12M32 41v12M38 41v12" stroke="#7A5C0E" stroke-width="1.4" opacity=".55"></path><path d="M22 20c2-4 6-6 10-6" stroke="#FFF6C8" stroke-width="2.4" stroke-linecap="round" fill="none" opacity=".8"></path></svg>`;
 const MEDALS = [[20,'🥇','Médaille d’or'],[17,'🥈','Médaille d’argent'],[14,'🥉','Médaille de bronze']];
 function medalOf(s){ const m = MEDALS.find(([min])=>s>=min); return m ? [m[1], m[2]] : null; }
 function burst(n, big){ return Array.from({length:n},(_,i)=>`<i style="background:${R[i%R.length].c};--a:${i*360/n}deg;--d:${big?90+(i*37)%110:120}px;animation-delay:${big?(i%3)*.12+.1:.15}s"></i>`).join(''); }
@@ -816,11 +828,20 @@ function showTro(html, big){
   tro.classList.toggle('big', !!big);
   tro.innerHTML = typo(html);
   try{ tro.showModal(); }catch(e){ tro.setAttribute('open',''); }
-  (tro.querySelector('[data-final]')||tro.querySelector('[data-trogo]')||tro.querySelector('[data-troclose]')).focus();
+  (tro.querySelector('input')||tro.querySelector('[data-final]')||tro.querySelector('[data-trogo]')||tro.querySelector('[data-troclose]'))?.focus();
 }
 function checkTrophy(z){
   if(S.qMode==='final'){
     const best = +(store.get('defi-best')||0); if(z.score>best) store.set('defi-best', z.score);
+    if(z.score===z.qs.length){
+      const first = !store.get('maitre'); store.set('maitre', '1');
+      showTro(`<div class="tro-b"><div class="tro-burst" aria-hidden="true">${burst(40, true)}</div><div class="tro-i tro-toque">${TOQUE}</div>
+       <p class="tro-n">20 / 20 au défi final</p><h2 id="tro-title">${first?'Toque d’or !':'Encore 20/20 !'}</h2>
+       <p>Tu es <b>Maître des régions de France</b>. Écris ton prénom : il s’affichera avec ta toque d’or sur l’accueil.</p>
+       <form class="toque-f" data-toque><label class="l" for="toque-nom">Ton prénom</label><input id="toque-nom" name="nom" maxlength="30" autocomplete="given-name" value="${esc(store.get('maitre-nom')||'')}" placeholder="ex. Léa">
+       <button class="btn" type="submit">Recevoir ma toque d’or</button></form></div>`, true);
+      return;
+    }
     const m = medalOf(z.score); if(!m) return;
     showTro(`<div class="tro-b"><div class="tro-burst" aria-hidden="true">${burst(20, z.score===20)}</div><div class="tro-i" aria-hidden="true">${m[0]}</div>
      <h2 id="tro-title">${m[1]} !</h2><p>${z.score}/20 au défi final.${z.score>best&&best?' Nouveau record !':''}</p>
@@ -843,6 +864,12 @@ function checkTrophy(z){
    <p class="tro-n">${won.size} / 13 trophée${won.size>1?'s':''}</p>
    <div class="tro-a"><button class="btn" data-trogo>Voir la carte</button><button class="tro-x" data-troclose>Continuer</button></div></div>`);
 }
+tro.addEventListener('submit', e=>{
+  if(!e.target.matches('[data-toque]')) return;
+  e.preventDefault();
+  store.set('maitre-nom', (e.target.querySelector('input').value||'').trim().slice(0,30));
+  tro.close(); go('carte');
+});
 tro.addEventListener('click', e=>{
   if(e.target.closest('[data-trogo]')){ tro.close(); go('carte'); }
   else if(e.target.closest('[data-final]')){ tro.close(); S.qMode='final'; S.quiz=null; render(); window.scrollTo(0,0); }

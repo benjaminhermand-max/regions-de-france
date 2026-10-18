@@ -238,12 +238,12 @@ dialog.pop::backdrop{background:rgba(30,22,16,.55)}
 /* toque d'or */
 .mrow{display:flex;align-items:center;gap:14px}
 .mrow h1{color:#7A5C0E}
-.toque{width:68px;height:68px;flex-shrink:0;filter:drop-shadow(0 4px 8px rgba(156,122,22,.45))}
-.tro-toque .toque{width:104px;height:104px}
+.toque{height:92px;width:auto;flex-shrink:0;display:block}
+.tro-toque .toque{height:170px;width:auto;margin:0 auto}
 .toque-f{display:flex;flex-direction:column;gap:6px;width:100%;text-align:left;margin-top:8px}
 .toque-f input{min-height:48px;border-radius:12px;border:1px solid var(--line);background:var(--paper);padding:0 14px;font:inherit;font-weight:600;color:var(--ink)}
 .toque-f .btn{margin-top:6px}
-@media (min-width:1024px){ .toque{width:86px;height:86px} }
+@media (min-width:1024px){ .mrow .toque{height:120px} }
 @media (prefers-reduced-motion: no-preference){ .mrow .toque{animation:toqueBob 3.5s ease-in-out infinite} @keyframes toqueBob{0%,100%{transform:translateY(0) rotate(-3deg)}50%{transform:translateY(-4px) rotate(3deg)}} }
 /* défi final et carte dorée */
 .seg.seg3{grid-template-columns:repeat(3,minmax(0,1fr))}
@@ -820,7 +820,7 @@ function render(){
 }
 const pop = document.getElementById('pop');
 const tro = document.getElementById('tro');
-const TOQUE = `<svg class="toque" viewBox="0 0 64 64" aria-hidden="true"><defs><linearGradient id="tg" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#FBEA8E"></stop><stop offset=".5" stop-color="#D4AF37"></stop><stop offset="1" stop-color="#9C7A16"></stop></linearGradient></defs><path d="M18 40c-7 0-12-5-12-11.5S11 17 17.5 17c1.5-6.5 7.2-11 14.5-11s13 4.5 14.5 11C53 17 58 22 58 28.5S53 40 46 40z" fill="url(#tg)" stroke="#7A5C0E" stroke-width="2" stroke-linejoin="round"></path><rect x="17" y="40" width="30" height="14" rx="2.5" fill="url(#tg)" stroke="#7A5C0E" stroke-width="2"></rect><path d="M26 41v12M32 41v12M38 41v12" stroke="#7A5C0E" stroke-width="1.4" opacity=".55"></path><path d="M22 20c2-4 6-6 10-6" stroke="#FFF6C8" stroke-width="2.4" stroke-linecap="round" fill="none" opacity=".8"></path></svg>`;
+const TOQUE = `<img class="toque" src="img/trophee-or.png" alt="">`;
 const MEDALS = [[20,'🥇','Médaille d’or'],[17,'🥈','Médaille d’argent'],[14,'🥉','Médaille de bronze']];
 function medalOf(s){ const m = MEDALS.find(([min])=>s>=min); return m ? [m[1], m[2]] : null; }
 function burst(n, big){ return Array.from({length:n},(_,i)=>`<i style="background:${R[i%R.length].c};--a:${i*360/n}deg;--d:${big?90+(i*37)%110:120}px;animation-delay:${big?(i%3)*.12+.1:.15}s"></i>`).join(''); }

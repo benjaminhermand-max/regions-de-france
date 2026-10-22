@@ -589,7 +589,7 @@ window.addEventListener('popstate', e=>{
 
 /* ---------- Carte ---------- */
 function vCarte(){
-  const paths = R.map(r=>`<a href="#" data-region="${r.id}" class="${r.id==='ara'?'home':''}" aria-label="${esc(r.nom)}"><path fill="${r.c}" d="${MAP[r.code]}"/></a>`).join('');
+  const paths = R.map(r=>`<a href="#" data-region="${r.id}" aria-label="${esc(r.nom)}"><path fill="${r.c}" d="${MAP[r.code]}"/></a>`).join('');
   const won = trophies();
   const cups = LABELS.filter(([code])=>R.some(r=>r.code===code && won.has(r.id))).map(([code,x,y])=>`<g transform="translate(${x} ${y-20})"><circle r="11.5"></circle><text y="5.5">🏆</text></g>`).join('');
   const labels = LABELS.map(([code,x,y,lines])=>`<text x="${x}" y="${y}">${lines.map((l,i)=>`<tspan x="${x}" dy="${i?10:0}">${esc(l)}</tspan>`).join('')}</text>`).join('');
@@ -613,7 +613,7 @@ function vRegion(){
   const r = byId[S.region]; const d = r.detail; const i = R.indexOf(r); const nx = R[(i+1)%R.length];
   const en = S.anim ? ' enter' : '';
   const band = `<div class="band${en}" style="background:${r.c}"><button class="back" data-go="regions">${ICON.back}Régions</button>
-   <div class="row"><div>${r.id==='ara'?'<span class="kick">Notre région</span>':''}<h1>${esc(r.nom)}</h1><p>${d?d.deps.length+' départements · ':''}Préfecture : ${esc(r.pref)}</p></div><img src="${r.img}" alt=""></div></div>`;
+   <div class="row"><div><h1>${esc(r.nom)}</h1><p>${d?d.deps.length+' départements · ':''}Préfecture : ${esc(r.pref)}</p></div><img src="${r.img}" alt=""></div></div>`;
   let body;
   if(!d){
     body = `<div class="stack" style="margin-top:16px">

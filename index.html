@@ -613,7 +613,7 @@ function vRegion(){
   const r = byId[S.region]; const d = r.detail; const i = R.indexOf(r); const nx = R[(i+1)%R.length];
   const en = S.anim ? ' enter' : '';
   const band = `<div class="band${en}" style="background:${r.c}"><button class="back" data-go="regions">${ICON.back}Régions</button>
-   <div class="row"><div><span class="kick">${r.id==='ara'?'Notre région':'Région '+(i+1)+' du cours'}</span><h1>${esc(r.nom)}</h1><p>${d?d.deps.length+' départements · ':''}Préfecture : ${esc(r.pref)}</p></div><img src="${r.img}" alt=""></div></div>`;
+   <div class="row"><div>${r.id==='ara'?'<span class="kick">Notre région</span>':''}<h1>${esc(r.nom)}</h1><p>${d?d.deps.length+' départements · ':''}Préfecture : ${esc(r.pref)}</p></div><img src="${r.img}" alt=""></div></div>`;
   let body;
   if(!d){
     body = `<div class="stack" style="margin-top:16px">

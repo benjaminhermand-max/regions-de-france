@@ -233,7 +233,7 @@ dialog.pop::backdrop{background:rgba(30,22,16,.55)}
 
 /* quiz photo */
 .qimg{display:flex;align-items:center;justify-content:center;border-radius:14px;padding:18px;min-height:180px}
-.qimg img{display:block;max-width:min(100%,300px);max-height:240px;border-radius:12px;background:#fff;box-shadow:0 6px 16px rgba(30,20,10,.22)}
+.qimg img{display:block;max-width:min(100%,320px);height:220px;width:auto;object-fit:contain;border-radius:12px;background:#fff;box-shadow:0 6px 16px rgba(30,20,10,.22)}
 .qimg.cut img{background:transparent;box-shadow:none;max-height:260px;filter:drop-shadow(0 8px 10px rgba(30,20,10,.3))}
 /* toque d'or */
 .mrow{display:flex;align-items:center;gap:14px}
@@ -554,6 +554,24 @@ function go(v, opts={}, push){
     else if(v==='region' || push || d===0) history.pushState(snap(d+1), '');
     else history.replaceState(snap(d), '');
   }catch(e){}
+}
+/* quiz : garder la correction et le bouton « Question suivante » à l'écran */
+const smooth = () => window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth';
+function revealNext(){
+  const nb = document.querySelector('[data-nextq]'); if(!nb) return;
+  const im = document.querySelector('.qimg img');
+  if(im && !im.complete){ im.addEventListener('load', revealNext, {once:true}); }
+  const nav = document.querySelector('nav.tabbar');
+  const low = nav && getComputedStyle(nav).bottom==='0px' ? nav.offsetHeight : 0;
+  const over = nb.getBoundingClientRect().bottom - (window.innerHeight - low) + 16;
+  if(over > 0) window.scrollBy({top: over, behavior: smooth()});
+}
+function toQuestion(){
+  const el = document.querySelector('.prog') || document.querySelector('.score'); if(!el) return;
+  const nav = document.querySelector('nav.tabbar');
+  const high = nav && getComputedStyle(nav).top==='0px' ? nav.offsetHeight : 0;
+  const top = el.getBoundingClientRect().top - high - 12;
+  if(top < 0) window.scrollBy({top, behavior: smooth()});
 }
 /* glisser le doigt sur une fiche pour changer d'onglet */
 const TABKEYS = ['identite','assiette','fromage','cave'];
@@ -955,8 +973,8 @@ document.addEventListener('click',e=>{
   if(t.dataset.region){ go('region',{region:t.dataset.region, tab:'identite'}); }
   else if(t.dataset.go){ go(t.dataset.go); }
   else if(t.dataset.tab){ const top=t.hasAttribute('data-top'); { const ks=['identite','assiette','fromage','cave']; if(t.dataset.tab!==S.tab) S.slide = ks.indexOf(t.dataset.tab)>ks.indexOf(S.tab) ? 'l' : 'r'; } S.tab=t.dataset.tab; render(); try{ history.replaceState(snap(hs().d||0), ''); }catch(err){} const tb=document.getElementById('tab-'+S.tab); if(top){ window.scrollTo(0,0); tb?.focus({preventScroll:true}); } else tb?.focus(); }
-  else if(t.dataset.ans!==undefined){ const z=S.quiz; z.answered=+t.dataset.ans; if(z.qs[z.i].opts[z.answered].ok) z.score++; render(); }
-  else if(t.hasAttribute('data-nextq')){ const z=S.quiz; z.i++; z.answered=null; render(); if(z.i>=z.qs.length) checkTrophy(z); }
+  else if(t.dataset.ans!==undefined){ const z=S.quiz; z.answered=+t.dataset.ans; if(z.qs[z.i].opts[z.answered].ok) z.score++; render(); revealNext(); }
+  else if(t.hasAttribute('data-nextq')){ const z=S.quiz; z.i++; z.answered=null; render(); toQuestion(); if(z.i>=z.qs.length) checkTrophy(z); }
   else if(t.hasAttribute('data-restart')){ S.quiz=null; render(); }
   else if(t.dataset.qmode){ S.qMode=t.dataset.qmode; S.quiz=null; render(); }
   else if(t.dataset.gfilter){ S.gFilter=t.dataset.gfilter; document.querySelectorAll('[data-gfilter]').forEach(b=>b.setAttribute('aria-pressed',b===t)); renderGlossList(); }

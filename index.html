@@ -706,6 +706,8 @@ const drinkCount = {}; R.forEach(r=>drinksOf(r).forEach(([n])=>drinkCount[keyN(n
 const firstSentence = t => { const m=String(t).match(/^.*?[a-zà-ÿ0-9)%]{2}[.!?](\s|$)/); return (m?m[0]:String(t)).trim(); };
 const maskName = (t, name) => { const nz=w=>w.normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase().replace(/[^a-z]/g,''); const keys=name.replace(/\(.*?\)/g,'').split(/[\s’'-]+/).map(nz).filter(w=>w.length>=4); return t.split(' ').map(w=>{ const n=nz(w); return keys.some(k=>n.startsWith(k.slice(0,Math.max(4,k.length-1)))) ? '…'+(w.match(/[.,;:)»]+$/)||[''])[0] : w; }).join(' '); };
 function regionOpts(correct){ return shuffle([correct, ...pick(R.filter(x=>x!==correct),3)]).map(x=>({label:x.nom, c:x.c, ok:x===correct})); }
+/* photos où le nom du produit se lit (étiquette, emballage) : n = nom visible, x = nom et région visibles */
+const NAMED_PHOTOS = {"ara|Génépi": "n", "ara|Vermouth de Chambéry": "n", "bfc|Beurre de Bresse AOP": "n", "bfc|Crème de Bresse AOP": "n", "bfc|Mont d’Or": "n", "bfc|Vin jaune": "n", "bfc|Vin de paille": "n", "ge|Macarons (de Nancy)": "n", "ge|Champagne": "n", "hdf|Bière": "n", "hdf|Bières du Nord": "n", "hdf|Picon": "n", "hdf|Genièvre": "n", "idf|Grand Marnier": "n", "nor|Caramels d’Isigny": "n", "nor|Beurre d’Isigny": "n", "nor|Crème d’Isigny": "n", "bre|Chèvre frais aux algues": "n", "bre|Eau-de-vie de cidre (lambig)": "n", "pdl|Sardine de Saint-Gilles": "n", "pdl|Petit-beurre": "n", "pdl|Gros-plant du Pays nantais": "n", "pdl|Guignolet": "n", "pdl|Cointreau": "n", "cvl|Rillettes de Tours": "n", "cvl|Lentille verte du Berry": "n", "cvl|Praline de Montargis": "n", "cvl|Vinaigre d’Orléans": "n", "cvl|Sancerre": "n", "cvl|Pouilly-Fumé": "n", "cvl|Chinon": "n", "cvl|Saint-Nicolas-de-Bourgueil": "n", "na|Piment d’Espelette": "n", "na|Caviar d’Aquitaine": "x", "na|Kiwi de l’Adour": "n", "na|Cognac": "n", "na|Pineau des Charentes": "n", "na|Côtes de Bergerac": "n", "na|Vins de Bordeaux": "n", "na|Armagnac": "n", "occ|Muscat de Frontignan": "n", "occ|Byrrh": "n", "occ|Noilly Prat": "n", "paca|Huile d’olive de Provence": "x", "paca|Pastis": "n", "paca|Banon": "n", "paca|Pacific": "n", "paca|Bandol": "n", "bfc|Crémant de Bourgogne": "x", "ge|Crémant d’Alsace": "x", "nor|Pommeau de Normandie": "x", "bre|Cidre breton": "x", "bre|Chouchen": "x", "bre|Pommeau de Bretagne": "x", "paca|Vins de Provence": "x", "cor|Cap Corse": "x", "cor|Muscat du Cap Corse": "x", "cor|Vins de Corse": "x"};
 function buildQuiz(){
   const pool=[], mode=S.qMode, final = mode==='final';
   const N = final ? 20 : 10;
@@ -740,6 +742,14 @@ function buildQuiz(){
   const QP = {dish:['Quelle est cette spécialité ?','Spécialités en photo'], cheese:['Quel est ce fromage ?','Fromages en photo'], drink:['Quelle est cette boisson ?','Boissons en photo']};
   (mode==='one' ? [byId[S.qRegion]] : R).forEach(r=>photoItems(r).forEach(it=>{
     const others = allNames[it.k].filter(x=>keyN(x)!==keyN(it.n));
+    const lab = NAMED_PHOTOS[r.id+'|'+it.n];
+    if(lab==='x') return;               /* le nom et la région se lisent sur la photo : pas de question photo */
+    if(lab==='n'){                      /* le nom se lit sur l'étiquette : on demande la région */
+      if(mode==='one') return;          /* dans le quiz d'une région, la réponse serait évidente */
+      pool.push({q:'De quelle région vient ce produit ?', img:it.img, cut:it.k==='drink', bg:'var(--seg)', photo:1, theme:'Produits en photo',
+        opts:()=>regionOpts(r), expl:`${it.n} : ${r.nom}.`});
+      return;
+    }
     pool.push({q:QP[it.k][0], img:it.img, cut:it.k==='drink', bg:r.c, photo:1, theme:QP[it.k][1],
       opts:()=>shuffle([{label:it.n, ok:true}, ...pick(others,3).map(x=>({label:x, ok:false}))]),
       expl: it.k==='cheese' ? `${it.n} : ${PATE[it.p].toLowerCase()}, ${r.nom}.` : `${it.n} : ${r.nom}.`});
